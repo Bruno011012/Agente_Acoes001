@@ -81,8 +81,9 @@ class CLasse_agtacoes_nlp() :
             doc_text = self.nlp(noti_ref)
             sm = []
             for doc_ref in doc_text :
-                vector_ref = doc.similarity(doc_ref)
-                sm.append(vector_ref)
+                vector_ref = [x.similarity(doc_ref) for x in doc]
+                v_max = max(vector_ref)
+                sm.append(v_max)
             if sm :
                 val_max = max(sm)
                 lista_score.append({"ID":self.frame_chunk.loc[i,"ID"],"Valor":val_max})
@@ -120,8 +121,9 @@ class CLasse_agtacoes_nlp() :
             sm = []
             doc_js = self.nlp(self.normalizar_texto(empre_ref))
             for doc_ref in doc_js :
-                vector_ref = doc_q.similarity(doc_ref)
-                sm.append(vector_ref)
+                vector_ref = [x.similarity(doc_ref) for x in doc_q]
+                v_max = max(vector_ref)
+                sm.append(v_max)
             if sm :
                 val_max = max(sm)
                 lista_score.append({"Empresa":empre_ref,"Ticker":frame_js.loc[i,"Ticker"],"Valor_Vetor":val_max})

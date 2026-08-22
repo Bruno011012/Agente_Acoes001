@@ -45,36 +45,53 @@ class CLasse_agtacoes_prompts() :
 
     def prompt_reconhecimento_empresas(self,query) :
         prompt = f"""
-                Você é um agente especializado em reconhecer empresas listadas na B3 em perguntas de usuários.
+                Você é um agente especializado em reconhecer empresas a partir do retorno de ferramentas de similaridade/vetorial.
 
-                VOCÊ DEVE OBRIGATORIAMENTE USAR AS FERRAMENTAS DISPONÍVEIS PARA:
-                1. Consultar a base de dados de tickers
-                2. Validar se a empresa existe na bolsa
-                3. Buscar o ticker correto para cada empresa mencionada
+                VOCÊ DEVE OBRIGATORIAMENTE:
+                1. Analisar a PERGUNTA do usuário
+                2. Analisar TODO o retorno da ferramenta
+                3. Retornar APENAS as empresas que tenham relação direta com a pergunta do usuário
 
-                NÃO utilize conhecimento interno para responder. SEMPRE consulte as ferramentas.
+                NÃO utilize conhecimento interno. Use apenas o que estiver no retorno da ferramenta e na pergunta.
 
                 FORMATO DE RESPOSTA OBRIGATÓRIO:
-                - Empresas encontradas: TICKER1.SA-TICKER2.SA-TICKER3.SA (hífen entre os tickers)
-                - Nenhuma empresa encontrada: NAO_ENCONTRADO
+                - Empresas encontradas: TICKER1-TICKER2-TICKER3 (hífen entre os tickers)
+                - Nenhuma empresa encontrada: Não envie nada
 
                 REGRAS:
-                1. Identifique TODAS as empresas mencionadas
-                2. Use as ferramentas para validar cada empresa
-                3. Retorne APENAS o formato solicitado
-                4. Sem explicações, pontuação ou texto adicional
-                5. Mantenha a ordem de aparição na pergunta
-                6. Não repita tickers duplicados
-                7. SEMPRE retorne o ticker com o sufixo .SA
+                1. Só inclua empresas que tenham relação com a pergunta do usuário
+                2. Ignore empresas que apareceram no retorno da ferramenta mas NÃO têm relação com a pergunta
+                3. Mantenha a ordem de aparição no retorno da ferramenta
+                4. Não repita tickers duplicados
+                5. Retorne o ticker EXATAMENTE como está no retorno (PETR4.SA, 005930.KS, TSM, TTE etc.)
+                6. Sem explicações, pontuação ou texto adicional
 
                 EXEMPLOS:
-                Pergunta: "Qual a cotação da Petrobras e Vale hoje?"
-                Resposta: PETR4.SA-VALE3.SA
 
-                Pergunta: "Compare Itaú e Bradesco"
-                Resposta: ITUB4.SA-BBDC4.SA
+                Pergunta: "Compare Petrobras e Samsung"
+                Retorno da ferramenta:
+                Empresa Ticker Valor_Vetor
+                0 Petrobras PETR4.SA 0.369056
+                1 TotalEnergies TTE 0.327648
+                2 Banco do Brasil BBAS3.SA 0.269776
+                3 Samsung Electronics 005930.KS 0.229594
+                4 TSMC TSM 0.199093
 
-                Pergunta: "Como está o mercado hoje?"
+                Resposta: PETR4.SA-005930.KS
+
+                Pergunta: "Como está a TSMC?"
+                Retorno da ferramenta:
+                Empresa Ticker Valor_Vetor
+                0 Petrobras PETR4.SA 0.369056
+                1 TSMC TSM 0.199093
+
+                Resposta: TSM
+
+                Pergunta: "Qual a cotação do dólar?"
+                Retorno da ferramenta:
+                Empresa Ticker Valor_Vetor
+                0 Petrobras PETR4.SA 0.369056
+
                 Resposta: NAO_ENCONTRADO
 
                 Pergunta: {query}

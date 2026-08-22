@@ -69,6 +69,7 @@ class CLasse_agtacoes_q() :
                 SELECT * FROM acoes WHERE Open <> 0 AND Ticker IN ('{tickers_str}') 
                 """
         frame_tr = pd.DataFrame(pd.read_sql_query(query,self.conexao))
+        frame_tr["Empresas"] = frame_tr["Ticker"].map(self.funcao_aux_01)
         return frame_tr
 
 
@@ -79,6 +80,7 @@ class CLasse_agtacoes_q() :
                 SELECT * FROM acoes WHERE Open <> 0 AND Ticker IN ('{tickers_str}')  AND Date >= '{data_i0}' AND Date <= '{data_f0}'
                 """
         frame_tr = pd.DataFrame(pd.read_sql_query(query,self.conexao))
+        frame_tr["Empresas"] = frame_tr["Ticker"].map(self.funcao_aux_01)
         return frame_tr
 
 

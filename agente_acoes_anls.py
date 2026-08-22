@@ -22,7 +22,8 @@ class CLasse_agtacoes_analyses() :
     def __init__(self,empr_ref,data_ref0=None,data_ref1=None):
         self.empre_ref = empr_ref
         self.data_ref01 = data_ref0
-        self.data_ref02 = data_ref0
+        self.data_ref02 = data_ref1
+        self.funcao_nomeemp001 = partial(self.funcao_aux_empre,x=self.empre_ref)
         self.desencadear()
 
 
@@ -30,15 +31,48 @@ class CLasse_agtacoes_analyses() :
         self.criar_parametros()
         self.conferencia_datas_ini()
         self.carregar_tabela_ori()
-        # self.grafico_01()
-        # self.grafico_02()
-        # self.grafico_03()
-        # self.grafico_04()
-        # self.grafico_05()
-        # self.grafico_06()
         self.criar_subplot_final()
 
+    def funcao_aux_empre(self,x=None) :
+        ticker_para_nome = {
+                    # Americanas
+                    "AAPL": "Apple",
+                    "MSFT": "Microsoft",
+                    "GOOGL": "Google",
+                    "AMZN": "Amazon",
+                    "NVDA": "NVIDIA",
+                    "META": "Meta Platforms",
+                    "TSLA": "Tesla",
+                    "BRK-B": "Berkshire Hathaway",
+                    "JPM": "JPMorgan Chase",
+                    "V": "Visa",
+        
+                    # Brasileiras
+                    "PETR4.SA": "Petrobras",
+                    "VALE3.SA": "Vale",
+                    "ITUB4.SA": "Itaú Unibanco",
+                    "BBDC4.SA": "Bradesco",
+                    "ABEV3.SA": "Ambev",
+                    "WEGE3.SA": "WEG",
+                    "BBAS3.SA": "Banco do Brasil",
+        
+                    # Grandes mundiais
+                    "NESN.SW": "Nestlé",
+                    "ASML": "ASML Holding",
+                    "SAP": "SAP",
+                    "MC.PA": "LVMH",
+                    "SHEL": "Shell",
+                    "TTE": "TotalEnergies",
+                    "TSM": "TSMC",
+                    "BABA": "Alibaba",
+                    "0700.HK": "Tencent",
+                    "TM": "Toyota",
+                    "005930.KS": "Samsung Electronics"
+                }
+        return ticker_para_nome[x[0]]
 
+
+    
     def criar_parametros(self) :
         self.tabelas = CLasse_agtacoes_q()
 
@@ -50,6 +84,7 @@ class CLasse_agtacoes_analyses() :
             self.tipo_cons = 0
 
 
+
     def carregar_tabela_ori(self) :
         if self.tipo_cons == 1 :
             frame_tr = self.tabelas.tabela_acoes_total(self.empre_ref)
@@ -58,179 +93,6 @@ class CLasse_agtacoes_analyses() :
         frame_tr["Date"] = pd.to_datetime(frame_tr["Date"],errors="coerce").reset_index(drop=True)
         self.frame_tr = frame_tr.copy()
         print(self.frame_tr)
-        
-
-
-    def grafico_01(self) :
-        caminho_grf = r".\graficos\analises_scipy"
-        df = self.frame_tr
-        df["suavizada"] = savgol_filter(
-            df["Close"],
-            window_length=21,
-            polyorder=3
-        )
-
-        fig = px.line(
-            df,
-            x="Date",
-            y=["Close", "suavizada"],
-            template="plotly_dark",
-            title="Série original vs. tendência suavizada"
-        )
-        arquivo_grf = os.path.join(caminho_grf,"tendencia_suav.html")
-        fig.write_html(arquivo_grf)
-        webbrowser.open(arquivo_grf)
-
-
-    def grafico_02(self) :
-        caminho_grf = r".\graficos\analises_scipy"
-        df = self.frame_tr
-        picos, _ = find_peaks(
-            df["Close"],
-            prominence=10
-        )
-
-        df_picos = df.iloc[picos]
-
-        fig = px.line(
-            df,
-            x="Date",
-            y="Close",
-            template="plotly_dark",
-            title="Detecção de picos"
-        )
-
-        fig.add_scatter(
-            x=df_picos["Date"],
-            y=df_picos["Close"],
-            mode="markers",
-            name="Picos"
-        )
-        arquivo_grf = os.path.join(caminho_grf,"deteccao_picos.html")
-        fig.write_html(arquivo_grf)
-        webbrowser.open(arquivo_grf)
-
-
-    def grafico_03(self) :
-        caminho_grf = r".\graficos\analises_scipy"
-        df = self.frame_tr 
-        y = df["Close"].values
-        y = y - np.mean(y)
-
-        acf = correlate(y, y, mode="full")
-        acf = acf[len(y)-1:]
-        acf = acf / acf[0]
-
-        lags = np.arange(len(acf))
-
-        df_acf = {
-            "lag": lags,
-            "autocorrelacao": acf
-        }
-
-        fig = px.line(
-            df_acf,
-            x="lag",
-            y="autocorrelacao",
-            template="plotly_dark",
-            title="Autocorrelação da série"
-        )
-        arquivo_grf = os.path.join(caminho_grf,"autocorrelacao.html")
-        fig.write_html(arquivo_grf)
-        webbrowser.open(arquivo_grf)
-
-
-    def grafico_04(self) :
-        caminho_grf = r".\graficos\analises_scipy"
-        df = self.frame_tr
-        frequencia, potencia = periodogram(df["Close"])
-
-        df_freq = {
-            "frequencia": frequencia,
-            "potencia": potencia
-        }
-
-        fig = px.line(
-            df_freq,
-            x="frequencia",
-            y="potencia",
-            template="plotly_dark",
-            title="Espectro de frequência"
-        )
-        arquivo_grf = os.path.join(caminho_grf,"espectro.html")
-        fig.write_html(arquivo_grf)
-        webbrowser.open(arquivo_grf)
-
-
-    def grafico_05(self) :
-        caminho_grf = r".\graficos\analises_scipy"
-        df = self.frame_tr
-        b, a = butter(
-            N=3,
-            Wn=0.1,
-            btype="low"
-        )
-
-        df["filtrada"] = filtfilt(
-            b,
-            a,
-            df["Close"]
-        )
-
-        fig = px.line(
-            df,
-            x="Date",
-            y=["Close", "filtrada"],
-            template="plotly_dark",
-            title="Filtro passa-baixa"
-        )
-
-        arquivo_grf = os.path.join(caminho_grf,"filtro_passab.html")
-        fig.write_html(arquivo_grf)
-        webbrowser.open(arquivo_grf)
-
-
-    def grafico_06(self) :
-        caminho_grf = r".\graficos\analises_scipy"
-        df = self.frame_tr
-        df["tendencia"] = savgol_filter(
-        df["Close"],
-            21,
-            3
-        )
-
-        df["residuo"] = (
-            df["Close"] - df["tendencia"]
-        )
-
-        anomalias, _ = find_peaks(
-            np.abs(df["residuo"]),
-            prominence=10
-        )
-
-        df["anomalia"] = False
-        df.loc[df.index[anomalias], "anomalia"] = True
-
-        fig = px.line(
-            df,
-            x="Date",
-            y="Close",
-            template="plotly_dark",
-            title="Detecção de anomalias"
-        )
-
-        df_anom = df[df["anomalia"]]
-
-        fig.add_scatter(
-            x=df_anom["Date"],
-            y=df_anom["Close"],
-            mode="markers",
-            name="Anomalias"
-        )
-        arquivo_grf = os.path.join(caminho_grf,"anomalias.html")
-        fig.write_html(arquivo_grf)
-        webbrowser.open(arquivo_grf)
-
 
 
     def criar_subplot_final(self) :
@@ -347,12 +209,309 @@ class CLasse_agtacoes_analyses() :
         fig.update_layout(
             template="plotly_dark",
             height=900,
-            title=f"Análises Series Temporais - Série Temporal {self.empre_ref}"
+            title=f"Análises Series Temporais - Série Temporal {self.funcao_nomeemp001()}"
         )
 
-        arquivo_grf = os.path.join(caminho_grf,"consolidado.html")
-        fig.write_html(arquivo_grf)
+        arquivo_grf = os.path.join(caminho_grf,f"consolidado_{self.funcao_nomeemp001()}.html")
+        fig.write_html(arquivo_grf,full_html=True,
+            include_plotlyjs=True,
+            config={
+                "responsive": True
+            })
         webbrowser.open(arquivo_grf)
 
+
+class CLasse_agtacoes_analysesc() :
+    def __init__(self,empr_ref,data_ref0=None,data_ref1=None):
+        self.empre_ref = empr_ref
+        self.data_ref01 = data_ref0
+        self.data_ref02 = data_ref1
+        self.desencadear()
+
+
+    def desencadear(self) :
+        self.criar_parametros()
+        self.conferencia_datas_ini()
+        self.carregar_tabela_ori()
+        self.criacao_subplots_comp()
+    
+
+    def criar_parametros(self) :
+        self.tabelas = CLasse_agtacoes_q()
+
+
+    def conferencia_datas_ini(self) :
+        if self.data_ref01 == None or self.data_ref02 == None :
+            self.tipo_cons = 1
+        else :
+            self.tipo_cons = 0
+
+
+
+    def carregar_tabela_ori(self) :
+        if self.tipo_cons == 1 :
+            frame_tr = self.tabelas.tabela_acoes_total(self.empre_ref)
+        else :
+            frame_tr = self.tabelas.tabela_acoes(self.empre_ref,self.data_ref01,self.data_ref02)
+        frame_tr["Date"] = pd.to_datetime(frame_tr["Date"],errors="coerce").reset_index(drop=True)
+        self.frame_tr = frame_tr.copy()
+        print(self.frame_tr)
+
+
+    def criacao_subplots_comp(self) :
+        # ==========================================================
+        # GRÁFICOS
+        # ==========================================================
+
+        grafico_01 = px.line(
+            self.frame_tr,
+            x="Date",
+            y="Close",
+            color="Empresas",
+            markers=True,
+            template="plotly_dark"
+        )
+
+        grafico_02 = px.histogram(
+            self.frame_tr,
+            x="Close",
+            color="Empresas",
+            template="plotly_dark"
+        )
+
+        grafico_03 = px.scatter(
+            self.frame_tr,
+            x="High",
+            y="Close",
+            color="Empresas",
+            trendline="lowess",
+            trendline_color_override="red",
+            template="plotly_dark"
+        )
+
+        grafico_04 = px.scatter_3d(
+            self.frame_tr,
+            x="Open",
+            y="Close",
+            z="Volume",
+            color="Empresas",
+            template="plotly_dark"
+        )
+
+        # ==========================================================
+        # SUBPLOTS
+        # ==========================================================
+
+        fig = make_subplots(
+
+            rows=2,
+            cols=2,
+
+            specs=[
+                [
+                    {"type": "xy"},
+                    {"type": "xy"}
+                ],
+                [
+                    {"type": "xy"},
+                    {"type": "scene"}
+                ]
+            ],
+
+            subplot_titles=[
+                "Evolução do Close",
+                "Distribuição do Close",
+                "High × Close",
+                "Open × Close × Volume"
+            ],
+
+            # Espaçamento mínimo para aproveitar a tela
+            horizontal_spacing=0.1,
+            vertical_spacing=0.1
+        )
+
+        # ==========================================================
+        # GRÁFICO 01
+        # ==========================================================
+
+        for trace in grafico_01.data:
+            fig.add_trace(
+                trace,
+                row=1,
+                col=1
+            )
+
+        # ==========================================================
+        # GRÁFICO 02
+        # ==========================================================
+
+        for trace in grafico_02.data:
+            fig.add_trace(
+                trace,
+                row=1,
+                col=2
+            )
+
+        # ==========================================================
+        # GRÁFICO 03
+        # ==========================================================
+
+        for trace in grafico_03.data:
+            fig.add_trace(
+                trace,
+                row=2,
+                col=1
+            )
+
+        # ==========================================================
+        # GRÁFICO 04
+        # ==========================================================
+
+        for trace in grafico_04.data:
+            fig.add_trace(
+                trace,
+                row=2,
+                col=2
+            )
+
+        # ==========================================================
+        # LAYOUT
+        # ==========================================================
+
+        fig.update_layout(
+
+            template="plotly_dark",
+
+            title={
+                "text": "Análise Comparativa de Ações",
+                "x": 0.5,
+                "xanchor": "center"
+            },
+
+            # Ocupa todo o espaço disponível
+            autosize=True,
+
+            # Remove margens grandes
+            margin=dict(
+                l=30,
+                r=30,
+                t=60,
+                b=30
+            ),
+
+            hovermode="closest",
+
+            # Legenda
+            legend=dict(
+                orientation="h",
+                yanchor="bottom",
+                y=1.01,
+                xanchor="center",
+                x=0.5
+            )
+        )
+
+        # ==========================================================
+        # EIXOS 2D
+        # ==========================================================
+
+        fig.update_xaxes(
+            title_text="Data",
+            row=1,
+            col=1
+        )
+
+        fig.update_yaxes(
+            title_text="Close",
+            row=1,
+            col=1
+        )
+
+        fig.update_xaxes(
+            title_text="Close",
+            row=1,
+            col=2
+        )
+
+        fig.update_yaxes(
+            title_text="Frequência",
+            row=1,
+            col=2
+        )
+
+        fig.update_xaxes(
+            title_text="Volume",
+            row=2,
+            col=1
+        )
+
+        fig.update_yaxes(
+            title_text="Close",
+            row=2,
+            col=1
+        )
+
+        # ==========================================================
+        # EIXOS 3D
+        # ==========================================================
+
+        fig.update_scenes(
+
+            xaxis_title="Open",
+            yaxis_title="Close",
+            zaxis_title="Volume",
+
+            # Aproveita melhor o espaço do quadrante
+            aspectmode="auto",
+
+            row=2,
+            col=2
+        )
+        fig.update_layout(
+            legend=dict(
+                orientation="h",
+                yanchor="top",
+                y=-0.02,
+                xanchor="center",
+                x=0.5
+            )
+        )
+
+        # ==========================================================
+        # HTML
+        # ==========================================================
+
+        caminho_ht = r".\graficos\comparativo"
+
+        os.makedirs(
+            caminho_ht,
+            exist_ok=True
+        )
+
+        arquivo_html = os.path.join(
+            caminho_ht,
+            "Comparativo.html"
+        )
+
+        # ==========================================================
+        # HTML OCUPANDO 100% DA JANELA
+        # ==========================================================
+
+        fig.write_html(
+            arquivo_html,
+            full_html=True,
+            include_plotlyjs=True,
+            config={
+                "responsive": True
+            }
+        )
+
+        # ==========================================================
+        # ABRIR NAVEGADOR
+        # ==========================================================
+
+        webbrowser.open(
+            "file://" + os.path.abspath(arquivo_html)
+        )
   
 

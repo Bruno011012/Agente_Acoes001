@@ -121,7 +121,7 @@ class Classe_api_acoes() :
         with sqlite3.connect(caminho_db) as conn :
              frame_origin = pd.DataFrame(pd.read_sql_query("SELECT * FROM acoes",conn))
         frame_ff = pd.concat([frame_origin,df_fina1])
-        frame_ff = frame_ff.drop_duplicates().reset_index(drop=True)
+        frame_ff = frame_ff.drop_duplicates(subset=["Date","Ticker","Close"]).reset_index(drop=True)
         frame_ff["Date"] = frame_ff["Date"].astype(str)
         with sqlite3.connect(caminho_db) as conn :
             frame_ff.to_sql(name="acoes",con=conn,if_exists="replace",index=False)
