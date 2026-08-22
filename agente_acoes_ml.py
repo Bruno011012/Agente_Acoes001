@@ -42,7 +42,9 @@ class CLasse_agtacoes_ml() :
 
 
     def criacao_tb_origem(self) :
-        frame_tr = self.tabelas.tabela_acoes("AMZN",'2026-06-01','2026-08-18')
+        data_ref02 = datetime.now().strftime("%Y-%m-%d")
+        data_ref01 = (datetime.now() - timedelta(days=40)).strftime("%Y-%m-%d")
+        frame_tr = self.tabelas.tabela_acoes("AMZN",data_ref01,data_ref02)
         frame_tr["Date"] = pd.to_datetime(frame_tr["Date"],errors="coerce")
         frame_tr = frame_tr.sort_values(by="Date").reset_index(drop=True)
         frame_tr = self.engenharia_features_signal(frame_tr)
@@ -353,7 +355,7 @@ class CLasse_agtacoes_ml() :
             sigma = pm.HalfNormal("sigma", sigma=1)
             mu = alpha + pm.math.dot(X_data,beta)
             Y_obs = pm.Normal("Y_obs",mu=mu,sigma=sigma,observed=y_data)
-            idata = pm.sample(draws=50,tune=50,chains=1,cores=1)
+            idata = pm.sample(draws=150,tune=150,chains=1,cores=1)
         with model :
             pm.set_data({"X_data":self.x_test,"y_data":self.y_test})
             predicoes_01 = pm.sample_posterior_predictive(idata,var_names=["Y_obs"],predictions=True).predictions
@@ -378,6 +380,7 @@ class CLasse_agtacoes_ml_boost() :
     def desencadear(self) :
         self.criar_parametros()
         self.criar_tabela_origem()
+        self.decodificar_base()
         colunas_ref = [x for x in list(self.frame_tr.columns) if x not in ["Date","Ticker","Nome_Empresa","Dia","Mes"]]
         dict_resul = {}
         lista_fim = []
@@ -387,14 +390,14 @@ class CLasse_agtacoes_ml_boost() :
                 target = col_ref
                 features = [x for x in colunas_ref if x not in [target]]
                 self.criar_parametros_modelo(target)
-                self.decodificar_base()
                 self.criar_base_treino_teste()
                 self.criar_modelo_bossting()
                 self.treinar_modelo()
                 y_predict = self.previsao_modelo()
                 dict_resul[col_ref] = y_predict
             lista_fim.append({"Date":date_ref,"Ticker":0,"Close":dict_resul["Close"],"High":dict_resul["High"],"Low":dict_resul["Low"],"Open":dict_resul["Open"],"Volume":dict_resul["Volume"],"Nome_Empresa":0,"Mes":date_ref.month,"Dia":date_ref.day})
-            self.frame_tr = pd.concat([self.frame_tr,pd.DataFrame(lista_fim)]).reset_index(drop=True)
+            frame_ff01 = self.decodificar_base_nvframe(pd.DataFrame(lista_fim))
+            self.frame_tr = pd.concat([self.frame_tr,frame_ff01]).reset_index(drop=True)
             date_ref = date_ref + relativedelta(days=1)
             print(u)
         frame_final = pd.DataFrame(lista_fim)
@@ -414,6 +417,7 @@ class CLasse_agtacoes_ml_boost() :
         frame_tr["Mes"] =  frame_tr["Date"].map(lambda x : x.month)
         frame_tr["Dia"] =  frame_tr["Date"].map(lambda x : x.day)
         frame_tr = frame_tr.sort_values(by="Date").reset_index(drop=True)
+        print(frame_tr["Ticker"].value_counts())
         self.frame_tr = frame_tr.copy()
 
 
@@ -428,6 +432,14 @@ class CLasse_agtacoes_ml_boost() :
         for col in list(self.frame_tr.columns) :
             if self.frame_tr[col].dtypes == "object" :
                 self.frame_tr[col] = decolder.fit_transform(self.frame_tr[col])
+
+
+    def decodificar_base_nvframe(self,data) :
+        decolder = LabelEncoder()
+        for col in list(data.columns) :
+            if data[col].dtypes == "object" :
+                data[col] = decolder.fit_transform(data[col])
+        return data
 
 
     def criar_base_treino_teste(self) :

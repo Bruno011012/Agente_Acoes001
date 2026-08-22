@@ -18,6 +18,7 @@ class Classe_api_acoes() :
     
 
     def desencadear(self) :
+        # self.gerar_requisicao()
         self.gerar_requisicao_diaria()
 
 
@@ -61,8 +62,8 @@ class Classe_api_acoes() :
     
     
     def gerar_requisicao(self) :
-        caminho_ref = os.path.join(r".\bases_dados\acoes","base_acoes.json")
-        caminho_db = os.path.join(r".\bases_dados\acoes","base_acoes.db")
+        caminho_ref = os.path.join(r".\data\acoes","base_acoes.json")
+        caminho_db = os.path.join(r".\data\acoes","base_acoes.db")
         # Principais empresas: EUA + Brasil + Grandes mundiais
         tickers = [
             # Americanas
@@ -94,8 +95,8 @@ class Classe_api_acoes() :
 
 
     def gerar_requisicao_diaria(self) :
-        caminho_ref = os.path.join(r".\bases_dados\acoes","base_acoes.json")
-        caminho_db = os.path.join(r".\bases_dados\acoes","base_acoes.db")
+        caminho_ref = os.path.join(r".\data\acoes","base_acoes.json")
+        caminho_db = os.path.join(r".\data\acoes","base_acoes.db")
         # Principais empresas: EUA + Brasil + Grandes mundiais
         tickers = [
             # Americanas

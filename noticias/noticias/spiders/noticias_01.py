@@ -5,7 +5,7 @@ class Noticias01Spider(scrapy.Spider):
     name = "noticias_01"
     custom_settings = {
     "FEEDS": {
-        r"C:\Users\beliasf\Desktop\Projetos\Agente_Acoes_V0\bases_dados\noticias\noticias_1.json": {
+        r"C:\Users\beliasf\Desktop\Projetos\Agente_Acoes_V0\data\noticias\noticias_1.json": {
             "format": "json",
             "encoding": "utf-8",
             "indent": 4,
@@ -37,7 +37,8 @@ class Noticias01Spider(scrapy.Spider):
             titulo_01 = linha_ref.css("span::text").get()
             yield {
                 "noticia_01":titulo,
-                "noticia_02":titulo_01
+                "noticia_02":titulo_01,
+                "Tipo":"Acoes"
 
                 }
             lista_ref.append(titulo)

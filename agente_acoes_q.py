@@ -59,8 +59,16 @@ class CLasse_agtacoes_q() :
 
     
     def criar_parametros(self) :
-        caminho = r".\bases_dados\acoes\base_acoes.db"
+        caminho = r".\data\acoes\base_acoes.db"
         self.conexao = sqlite3.connect(caminho)
+
+
+    def tabela_acoes_total(self,emp_ref)-> pd.DataFrame :
+        query = f"""
+                SELECT * FROM acoes WHERE Open <> 0 AND Ticker = '{emp_ref}' 
+                """
+        frame_tr = pd.DataFrame(pd.read_sql_query(query,self.conexao))
+        return frame_tr
 
 
 

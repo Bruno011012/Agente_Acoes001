@@ -59,8 +59,8 @@ class CLasse_agtacoes_nlp() :
 
 
     def carregar_frame_ori(self) :
-        caminho = r".\bases_dados\noticias\diario\Noticias_21_08_2026.json"
-        frame_tr = pd.DataFrame(pd.read_json(caminho))
+        caminho = r".\data\noticias\consolidado\Base_consolidada.parquet"
+        frame_tr = pd.DataFrame(pd.read_parquet(caminho))
         self.frame_tr = frame_tr.copy()
 
 
@@ -102,7 +102,7 @@ class CLasse_agtacoes_nlp() :
                     val_text = f"""{val_text} {v_r}"""
                 lista_score.append({"ID":self.frame_scores.loc[i,"ID"],"Intensidade":len(lemma_noti.intersection(lemma_query)),"Retorno":val_text})
         frame_final = pd.DataFrame(lista_score)
-        frame_final_01 = pd.merge(frame_final,self.frame_scores,left_on="ID",right_on="ID",how="left",suffixes=("_x","_y"))
+        frame_final_01 = pd.merge(frame_final,self.frame_tr,left_on="ID",right_on="ID_ref",how="left",suffixes=("_x","_y"))
         frame_final_01 = frame_final_01.sort_values(by="Intensidade",ascending=False).reset_index(drop=True).head(4)
         print(frame_final_01)
 
@@ -126,4 +126,4 @@ class CLasse_agtacoes_nlp() :
         pprint.pprint(frame_res)
 
 
-CLasse_agtacoes_nlp("Gosatria de saber sobre noticias de trump e lula e sobre o banco do brasil")
+CLasse_agtacoes_nlp("Gosatria de saber sobre noticias de trump e lula e sobre o banco do brasil google")
