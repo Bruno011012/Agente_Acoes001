@@ -14,22 +14,24 @@ import pprint
 
 
 class CLasse_agtacoes_nlp() :
-    def __init__(self,query):
-        self.query = query
+    def __init__(self):
         self.criar_parametros()
-        self.desencadear()
-        self.desencadear_01()
+        
 
 
-    def desencadear(self) :
+    def desencadear(self,query=None) :
+        self.query = query
         self.carregar_frame_ori()
         self.criacao_chunking()
         self.busca_semantica()
-        self.busca_lexica()
+        noticias = self.busca_lexica()
+        return noticias
 
 
-    def desencadear_01(self) :
-        self.busca_empresa()
+    def desencadear_01(self,query=None) :
+        self.query = query
+        empresas = self.busca_empresa()
+        return empresas
 
 
     def normalizar_texto(self,texto):
@@ -69,7 +71,7 @@ class CLasse_agtacoes_nlp() :
         for i , noticia_ref in enumerate(self.frame_tr["Noticia"]) :
             lista_chunkings.append({"ID":self.frame_tr.loc[i,"ID_ref"],"Texto":self.normalizar_texto(noticia_ref)})
         self.frame_chunk = pd.DataFrame(lista_chunkings)
-        print(self.frame_chunk)
+    
 
 
     def busca_semantica(self) :
@@ -88,7 +90,7 @@ class CLasse_agtacoes_nlp() :
         frame_score = frame_score.sort_values(by="Valor",ascending=False).reset_index(drop=True).head(10)
         frame_score_01 = pd.merge(frame_score,self.frame_chunk,left_on="ID",right_on="ID",how="left",suffixes=("_x","_y"))
         self.frame_scores = frame_score_01.copy()
-        print(frame_score)
+       
 
 
     def busca_lexica(self) :
@@ -104,7 +106,9 @@ class CLasse_agtacoes_nlp() :
         frame_final = pd.DataFrame(lista_score)
         frame_final_01 = pd.merge(frame_final,self.frame_tr,left_on="ID",right_on="ID_ref",how="left",suffixes=("_x","_y"))
         frame_final_01 = frame_final_01.sort_values(by="Intensidade",ascending=False).reset_index(drop=True).head(4)
-        print(frame_final_01)
+        js_ret = frame_final_01.to_json(orient="records",force_ascii=False,indent=4)
+        pprint.pprint(js_ret)
+        return js_ret
 
 
     def busca_empresa(self) :
@@ -123,7 +127,9 @@ class CLasse_agtacoes_nlp() :
                 lista_score.append({"Empresa":empre_ref,"Ticker":frame_js.loc[i,"Ticker"],"Valor_Vetor":val_max})
         frame_res = pd.DataFrame(lista_score)
         frame_res = frame_res.sort_values(by="Valor_Vetor",ascending=False).reset_index(drop=True).head(5)
+        resposta_js =  frame_res.to_json(orient="records",force_ascii=False,indent=4)
         pprint.pprint(frame_res)
+        return resposta_js
+        
 
 
-CLasse_agtacoes_nlp("Gosatria de saber sobre noticias de trump e lula e sobre o banco do brasil google")

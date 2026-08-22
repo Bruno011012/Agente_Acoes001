@@ -30,12 +30,12 @@ class CLasse_agtacoes_analyses() :
         self.criar_parametros()
         self.conferencia_datas_ini()
         self.carregar_tabela_ori()
-        self.grafico_01()
-        self.grafico_02()
-        self.grafico_03()
-        self.grafico_04()
-        self.grafico_05()
-        self.grafico_06()
+        # self.grafico_01()
+        # self.grafico_02()
+        # self.grafico_03()
+        # self.grafico_04()
+        # self.grafico_05()
+        # self.grafico_06()
         self.criar_subplot_final()
 
 
@@ -57,6 +57,7 @@ class CLasse_agtacoes_analyses() :
             frame_tr = self.tabelas.tabela_acoes(self.empre_ref,self.data_ref01,self.data_ref02)
         frame_tr["Date"] = pd.to_datetime(frame_tr["Date"],errors="coerce").reset_index(drop=True)
         self.frame_tr = frame_tr.copy()
+        print(self.frame_tr)
         
 
 
@@ -355,4 +356,3 @@ class CLasse_agtacoes_analyses() :
 
   
 
-CLasse_agtacoes_analyses("AMZN")

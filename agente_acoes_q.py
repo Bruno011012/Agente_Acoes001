@@ -64,8 +64,9 @@ class CLasse_agtacoes_q() :
 
 
     def tabela_acoes_total(self,emp_ref)-> pd.DataFrame :
+        tickers_str = "', '".join(emp_ref)  # Ex: "PETR4.SA', 'VALE3.SA"
         query = f"""
-                SELECT * FROM acoes WHERE Open <> 0 AND Ticker = '{emp_ref}' 
+                SELECT * FROM acoes WHERE Open <> 0 AND Ticker IN ('{tickers_str}') 
                 """
         frame_tr = pd.DataFrame(pd.read_sql_query(query,self.conexao))
         return frame_tr
@@ -73,12 +74,12 @@ class CLasse_agtacoes_q() :
 
 
     def tabela_acoes(self,emp_ref,data_i0,data_f0)-> pd.DataFrame :
+        tickers_str = "', '".join(emp_ref)  # Ex: "PETR4.SA', 'VALE3.SA"
         query = f"""
-                SELECT * FROM acoes WHERE Open <> 0 AND Ticker = '{emp_ref}' AND Date >= '{data_i0}' AND Date <= '{data_f0}'
+                SELECT * FROM acoes WHERE Open <> 0 AND Ticker IN ('{tickers_str}')  AND Date >= '{data_i0}' AND Date <= '{data_f0}'
                 """
         frame_tr = pd.DataFrame(pd.read_sql_query(query,self.conexao))
         return frame_tr
 
 
 
-CLasse_agtacoes_q()
