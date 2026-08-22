@@ -44,7 +44,7 @@ class CLasse_agtacoes_ml() :
     def criacao_tb_origem(self) :
         data_ref02 = datetime.now().strftime("%Y-%m-%d")
         data_ref01 = (datetime.now() - timedelta(days=40)).strftime("%Y-%m-%d")
-        frame_tr = self.tabelas.tabela_acoes("AMZN",data_ref01,data_ref02)
+        frame_tr = self.tabelas.tabela_acoes(["AMZN"],data_ref01,data_ref02)
         frame_tr["Date"] = pd.to_datetime(frame_tr["Date"],errors="coerce")
         frame_tr = frame_tr.sort_values(by="Date").reset_index(drop=True)
         frame_tr = self.engenharia_features_signal(frame_tr)
@@ -329,7 +329,7 @@ class CLasse_agtacoes_ml() :
 
     def criacao_base_treino_teste(self) :
         target = "Close"
-        features = [x for x in list(self.frame_tr.columns) if x not in [target,"Date","Ticker","Nome_Empresa"]]
+        features = [x for x in list(self.frame_tr.columns) if x not in [target,"Date","Ticker","Nome_Empresa","Empresas"]]
         df_train = self.frame_tr.reset_index(drop=True)
         df_test = self.frame_ts0
         self.df_test0 = df_test.copy()
@@ -381,7 +381,7 @@ class CLasse_agtacoes_ml_boost() :
         self.criar_parametros()
         self.criar_tabela_origem()
         self.decodificar_base()
-        colunas_ref = [x for x in list(self.frame_tr.columns) if x not in ["Date","Ticker","Nome_Empresa","Dia","Mes"]]
+        colunas_ref = [x for x in list(self.frame_tr.columns) if x not in ["Date","Ticker","Nome_Empresa","Dia","Mes","Empresas"]]
         dict_resul = {}
         lista_fim = []
         date_ref = datetime.now()
@@ -412,7 +412,7 @@ class CLasse_agtacoes_ml_boost() :
 
 
     def criar_tabela_origem(self) :
-        frame_tr = self.tabelas.tabela_acoes("AMZN",'2026-02-01','2026-08-18')
+        frame_tr = self.tabelas.tabela_acoes(["AMZN"],'2026-02-01','2026-08-18')
         frame_tr["Date"] = pd.to_datetime(frame_tr["Date"],errors="coerce")
         frame_tr["Mes"] =  frame_tr["Date"].map(lambda x : x.month)
         frame_tr["Dia"] =  frame_tr["Date"].map(lambda x : x.day)
@@ -424,7 +424,7 @@ class CLasse_agtacoes_ml_boost() :
 
     def criar_parametros_modelo(self,alvo) :
         self.target = alvo
-        self.features = [x for x in list(self.frame_tr.columns) if x not in [self.target,"Ticker","Date","Nome_Empresa"]]
+        self.features = [x for x in list(self.frame_tr.columns) if x not in [self.target,"Ticker","Date","Nome_Empresa","Empresas"]]
 
 
     def decodificar_base(self) :

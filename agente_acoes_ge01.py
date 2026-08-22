@@ -111,6 +111,8 @@ class CLasse_agtacoes_ge01() :
             else :
                 CLasse_agtacoes_analysesc(empresas,data_ref0=datas_ref[0],data_ref1=datas_ref[1])
                 Classe_copiadora_zip(1)
+        noticias = self.agentes.agente_noticias_01(self.query)
+        print(noticias)
 
 
 class Classe_copiadora_zip() :
@@ -151,8 +153,8 @@ class Classe_copiadora_zip() :
         )
 
         # Move para a pasta destino
-        shutil.move(zip_criado, os.path.join(destino, "analises_scipy.zip"))
+        shutil.move(zip_criado, os.path.join(destino, "analises_ml.zip"))
                 
 
 
-CLasse_agtacoes_ge01("Me de uma analise do Petrobras e da samsung e a Google no ano de 2025 ?")
+CLasse_agtacoes_ge01("quero um relatoio da petrobras e do itau ?")

@@ -20,7 +20,7 @@ class CLasse_agtacoes_prompts() :
                 Sua função é analisar a pergunta do usuário e classificar em UMA das três intenções abaixo:
 
                 1. ANALISE - Perguntas sobre dados históricos, relatórios, diagnósticos, 
-                pesquisas, indicadores atuais e comportamento passado das ações.
+                pesquisas, analises, indicadores atuais e comportamento passado das ações.
 
                 2. SIMULACAO - Perguntas sobre projeções futuras, previsões, valores estimados, 
                 cenários e simulações de desempenho.
@@ -134,3 +134,42 @@ class CLasse_agtacoes_prompts() :
         
                     """
         return prompot
+
+
+    def prompt_agente_noticias_01(self,query) :
+        prompt_ref = f"""
+                    Você é um agente especializado em notícias do mercado financeiro e de ações.
+
+                Seu papel é analisar as notícias retornadas pela ferramenta de NLP e correlacioná-las com a pergunta do usuário, entregando um resumo objetivo das principais informações relevantes.
+
+                ### Ferramenta disponível:
+                # Obrigatorio o uso da Ferramenta para responder.
+                Você receberá o resultado de uma ferramenta de NLP que busca notícias relacionadas à pergunta do usuário. Use exclusivamente essas notícias como fonte de informação.
+
+                ### Instruções:
+                1. Analise a pergunta do usuário com atenção.
+                2. Examine todas as notícias retornadas pela ferramenta.
+                3. Selecione apenas as notícias que tenham relação direta com a pergunta.
+                4. Ignore notícias irrelevantes ou que não estejam relacionadas ao contexto da pergunta.
+                5. Faça um resumo claro, objetivo e em linguagem acessível das principais notícias selecionadas.
+                6. Destaque os pontos mais importantes (impacto no mercado, empresa, setor, resultados, etc.).
+                7. Não invente informações. Use somente o conteúdo fornecido pela ferramenta.
+                8. Se nenhuma notícia for relevante para a pergunta, responda: "Nenhuma notícia relevante encontrada para esta pergunta."
+
+                ### Formato de resposta:
+                - Comece com um breve resumo geral (1 ou 2 frases).
+                - Em seguida, liste as principais notícias de forma resumida (máximo de 3 a 5 pontos).
+                - Seja conciso e direto.
+
+                ### Exemplo de estrutura:
+                **Resumo:**  
+                [Breve visão geral das notícias relacionadas à pergunta]
+
+                **Principais notícias:**
+                - [Notícia 1 resumida]
+                - [Notícia 2 resumida]
+                - [Notícia 3 resumida]
+
+                Pergunta do usuário: {query}
+                    """
+        return prompt_ref

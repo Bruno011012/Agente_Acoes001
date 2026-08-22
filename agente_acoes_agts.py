@@ -49,3 +49,11 @@ class CLasse_agtacoes_agts(CLasse_agtacoes_llm) :
         agent = create_agent(self.llm,system_prompt=prompt_ref)
         response = agent.invoke({"input":prompt_ref})
         return self.verificar_resposta(response)
+
+
+    def agente_noticias_01(self,query) :
+        prompt_ref = self.prompts.prompt_agente_noticias_01(query)
+        tools_ref = self.tools.ferramenta_busca_noticias(query) + self.tools.ferramenta_busca_empresas(query)
+        agent = create_agent(self.llm,tools=tools_ref,system_prompt=prompt_ref)
+        response = agent.invoke({"input":prompt_ref})
+        return self.verificar_resposta(response)

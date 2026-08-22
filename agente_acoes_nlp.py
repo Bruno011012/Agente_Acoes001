@@ -18,7 +18,6 @@ class CLasse_agtacoes_nlp() :
         self.criar_parametros()
         
 
-
     def desencadear(self,query=None) :
         self.query = query
         self.carregar_frame_ori()
@@ -76,12 +75,13 @@ class CLasse_agtacoes_nlp() :
 
     def busca_semantica(self) :
         doc = self.nlp(self.normalizar_texto(self.query))
+        palavras_tempo = {"ano", "anos", "mês", "meses", "dia", "dias", "semana", "semanas"}
         lista_score = []
         for i , noti_ref in enumerate(self.frame_chunk["Texto"]) :
             doc_text = self.nlp(noti_ref)
             sm = []
             for doc_ref in doc_text :
-                vector_ref = [x.similarity(doc_ref) for x in doc]
+                vector_ref = [x.similarity(doc_ref) for x in doc if not x.is_stop and not x.is_punct and not x.is_space and not x.like_num and x.text.lower() not in palavras_tempo]
                 v_max = max(vector_ref)
                 sm.append(v_max)
             if sm :
@@ -91,12 +91,14 @@ class CLasse_agtacoes_nlp() :
         frame_score = frame_score.sort_values(by="Valor",ascending=False).reset_index(drop=True).head(10)
         frame_score_01 = pd.merge(frame_score,self.frame_chunk,left_on="ID",right_on="ID",how="left",suffixes=("_x","_y"))
         self.frame_scores = frame_score_01.copy()
-       
+        pprint.pprint(self.frame_scores)
+        print([x for x in doc if not x.is_stop and not x.is_punct and not x.is_space])
 
 
     def busca_lexica(self) :
         lista_score = []
-        lemma_query = {x.lemma_ for x in self.nlp(self.normalizar_texto(self.query))}
+        palavras_tempo = {"ano", "anos", "mês", "meses", "dia", "dias", "semana", "semanas"}
+        lemma_query = {x.lemma_ for x in self.nlp(self.normalizar_texto(self.query)) if not x.is_stop and not x.is_punct and not x.is_space and not x.like_num and x.text.lower() not in palavras_tempo}
         for i , texto_ref in enumerate(self.frame_scores["Texto"]) :
             lemma_noti = {x.lemma_ for x in self.nlp(texto_ref)}
             if lemma_noti.intersection(lemma_query) :
@@ -106,7 +108,7 @@ class CLasse_agtacoes_nlp() :
                 lista_score.append({"ID":self.frame_scores.loc[i,"ID"],"Intensidade":len(lemma_noti.intersection(lemma_query)),"Retorno":val_text})
         frame_final = pd.DataFrame(lista_score)
         frame_final_01 = pd.merge(frame_final,self.frame_tr,left_on="ID",right_on="ID_ref",how="left",suffixes=("_x","_y"))
-        frame_final_01 = frame_final_01.sort_values(by="Intensidade",ascending=False).reset_index(drop=True).head(4)
+        frame_final_01 = frame_final_01.sort_values(by="Intensidade",ascending=False).reset_index(drop=True).head(6)
         js_ret = frame_final_01.to_json(orient="records",force_ascii=False,indent=4)
         pprint.pprint(js_ret)
         return js_ret
@@ -116,22 +118,25 @@ class CLasse_agtacoes_nlp() :
         caminho_js = r".\documentos\empresas\empresas.json"
         frame_js = pd.DataFrame(pd.read_json(caminho_js))
         doc_q = self.nlp(self.normalizar_texto(self.query))
+        palavras_tempo = {"ano", "anos", "mês", "meses", "dia", "dias", "semana", "semanas"}
         lista_score = []
         for i , empre_ref in enumerate(frame_js["Nome_Empresa"]) :
             sm = []
             doc_js = self.nlp(self.normalizar_texto(empre_ref))
             for doc_ref in doc_js :
-                vector_ref = [x.similarity(doc_ref) for x in doc_q]
+                vector_ref = [x.similarity(doc_ref) for x in doc_q if not x.is_stop and not x.is_punct and not x.is_space and not x.like_num and x.text.lower() not in palavras_tempo]
                 v_max = max(vector_ref)
                 sm.append(v_max)
             if sm :
                 val_max = max(sm)
                 lista_score.append({"Empresa":empre_ref,"Ticker":frame_js.loc[i,"Ticker"],"Valor_Vetor":val_max})
         frame_res = pd.DataFrame(lista_score)
-        frame_res = frame_res.sort_values(by="Valor_Vetor",ascending=False).reset_index(drop=True).head(5)
+        frame_res = frame_res.sort_values(by="Valor_Vetor",ascending=False).reset_index(drop=True).head(7)
         resposta_js =  frame_res.to_json(orient="records",force_ascii=False,indent=4)
         pprint.pprint(frame_res)
         return resposta_js
         
 
 
+# nlp = CLasse_agtacoes_nlp()
+# nlp.desencadear("Me de uma analise da Trump no ano de 2026 ?")

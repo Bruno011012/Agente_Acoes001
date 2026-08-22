@@ -326,8 +326,8 @@ class CLasse_agtacoes_analysesc() :
             ],
 
             # Espaçamento mínimo para aproveitar a tela
-            horizontal_spacing=0.1,
-            vertical_spacing=0.1
+            horizontal_spacing=0.09,
+            vertical_spacing=0.09
         )
 
         # ==========================================================
