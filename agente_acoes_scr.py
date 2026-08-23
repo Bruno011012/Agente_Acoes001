@@ -11,6 +11,9 @@ from noticias.noticias.spiders.noticias_01 import Noticias01Spider
 from noticias.noticias.spiders.noticias_02 import Noticias02Spider
 from noticias.noticias.spiders.noticias_03 import Noticias03Spider
 from noticias.noticias.spiders.noticias_04 import Noticias04Spider
+from noticias.noticias.spiders.noticias_05 import Noticias05Spider
+from noticias.noticias.spiders.noticias_06 import Noticias06Spider
+from noticias.noticias.spiders.noticias_07 import Noticias07Spider
 
 from scrapy import cmdline
 import re 
@@ -31,6 +34,9 @@ class CLasse_agtacoes_scr() :
         self.tratamento_02()
         self.tratamento_03()
         self.tratamento_04()
+        self.tratamento_05()
+        self.tratamento_06()
+        self.tratamento_07()
         self.consolidar_final()
 
     def disparar_spider(self) :
@@ -42,6 +48,9 @@ class CLasse_agtacoes_scr() :
         process.crawl(Noticias02Spider)
         process.crawl(Noticias03Spider)
         process.crawl(Noticias04Spider)
+        process.crawl(Noticias05Spider)
+        process.crawl(Noticias06Spider)
+        process.crawl(Noticias07Spider)
         
 
         process.start()
@@ -127,6 +136,61 @@ class CLasse_agtacoes_scr() :
         filtro_01.to_json(caminho_ref1,orient="records",force_ascii=False,indent=4)
         print(filtro_01)
 
+    def tratamento_05(self) :
+        data_ref_dd = datetime.now().strftime("%d/%m/%Y")
+        caminho = r".\data\noticias\noticias_5.json"
+        frame_tr = pd.DataFrame(pd.read_json(caminho))
+        frame_tr = frame_tr.fillna("-")
+        frame_tr["Quant01"] = frame_tr["noticia_01"].map(lambda x : len(x))
+        lista_ref = []
+        for i , val_ref in enumerate(frame_tr["noticia_01"]) :
+            if val_ref.strip() != "-" and len(val_ref) > 10 :
+                lista_ref.append({"Noticia":val_ref,"Data_ref":data_ref_dd,"Link":frame_tr.loc[i,"Link"]})
+        filtro_01 = pd.DataFrame(lista_ref)
+        filtro_01 = filtro_01.drop_duplicates().reset_index(drop=True)
+        filtro_01["ID_ref"] = "-"
+        filtro_01["Tipo"] = "Bolsa Americana"
+        caminho_ref1 = os.path.join(r".\data\noticias\diario",f"Noticiasbeua2_{data_ref_dd.replace('/','_')}.json") 
+        filtro_01.to_json(caminho_ref1,orient="records",force_ascii=False,indent=4)
+        print(filtro_01)
+
+
+    def tratamento_06(self) :
+        data_ref_dd = datetime.now().strftime("%d/%m/%Y")
+        caminho = r".\data\noticias\noticias_6.json"
+        frame_tr = pd.DataFrame(pd.read_json(caminho))
+        frame_tr = frame_tr.fillna("-")
+        frame_tr["Quant01"] = frame_tr["noticia_01"].map(lambda x : len(x))
+        lista_ref = []
+        for i , val_ref in enumerate(frame_tr["noticia_01"]) :
+            if val_ref.strip() != "-" and len(val_ref) > 10 :
+                lista_ref.append({"Noticia":val_ref,"Data_ref":data_ref_dd,"Link":frame_tr.loc[i,"Link"]})
+        filtro_01 = pd.DataFrame(lista_ref)
+        filtro_01 = filtro_01.drop_duplicates().reset_index(drop=True)
+        filtro_01["ID_ref"] = "-"
+        filtro_01["Tipo"] = "Bolsa Americana"
+        caminho_ref1 = os.path.join(r".\data\noticias\diario",f"Noticiasbeua3_{data_ref_dd.replace('/','_')}.json") 
+        filtro_01.to_json(caminho_ref1,orient="records",force_ascii=False,indent=4)
+        print(filtro_01)
+
+    def tratamento_07(self) :
+        data_ref_dd = datetime.now().strftime("%d/%m/%Y")
+        caminho = r".\data\noticias\noticias_7.json"
+        frame_tr = pd.DataFrame(pd.read_json(caminho))
+        frame_tr = frame_tr.fillna("-")
+        frame_tr["Quant01"] = frame_tr["noticia_01"].map(lambda x : len(x))
+        lista_ref = []
+        for i , val_ref in enumerate(frame_tr["noticia_01"]) :
+            if val_ref.strip() != "-" and len(val_ref) > 10 :
+                lista_ref.append({"Noticia":val_ref,"Data_ref":data_ref_dd,"Link":frame_tr.loc[i,"Link"]})
+        filtro_01 = pd.DataFrame(lista_ref)
+        filtro_01 = filtro_01.drop_duplicates().reset_index(drop=True)
+        filtro_01["ID_ref"] = "-"
+        filtro_01["Tipo"] = "Bolsa Americana"
+        caminho_ref1 = os.path.join(r".\data\noticias\diario",f"Noticiasbeua4_{data_ref_dd.replace('/','_')}.json") 
+        filtro_01.to_json(caminho_ref1,orient="records",force_ascii=False,indent=4)
+        print(filtro_01)
+
 
     def consolidar_final(self) :
         frame_conca = pd.DataFrame(columns=['Noticia', 'Data_ref', 'ID_ref', 'Tipo'])
@@ -141,7 +205,7 @@ class CLasse_agtacoes_scr() :
         for i , noti_ref in enumerate(frame_conca["ID_ref"]) :
             frame_conca.loc[i,"ID_ref"] = x
             x += 1
-        frame_conca = frame_conca.drop_duplicates().reset_index(drop=True)
+        frame_conca = frame_conca.drop_duplicates(subset="Noticia").reset_index(drop=True)
         frame_conca.to_parquet(caminho_dest,engine="pyarrow",index=False)
         print(frame_conca)
 

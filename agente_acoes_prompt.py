@@ -169,7 +169,7 @@ class CLasse_agtacoes_prompts() :
             Não de sugestões de pesquisas mais detalhas no final nao de sinais que sua pesquisa e simples ou imcompleta, sugira mais topicos para pesquisa.
 
             ### USO DA FERRAMENTA
-            - Execute a ferramenta de busca de notícias NO MÁXIMO 2 VEZES.
+            - Execute a ferramenta de busca de notícias NO MÁXIMO 1 VEZ.
             - Faça uma única busca contendo todas as empresas identificadas na pergunta.
             - Não repita a busca para a mesma empresa.
             - Após receber o resultado da ferramenta, responda imediatamente usando apenas os dados retornados.
@@ -215,7 +215,7 @@ class CLasse_agtacoes_prompts() :
             Não de sugestões de pesquisas mais detalhas no final nao de sinais que sua pesquisa e simples ou imcompleta, sugira mais topicos para pesquisa.
 
             ### USO DA FERRAMENTA
-            - Execute a ferramenta de busca de notícias NO MÁXIMO 2 VEZES.
+            - Execute a ferramenta de busca de notícias NO MÁXIMO 1 VEZ.
             - Faça uma única busca contendo todas as empresas identificadas na pergunta.
             - Não repita a busca para a mesma empresa.
             - Após receber o resultado da ferramenta, responda imediatamente usando apenas os dados retornados.

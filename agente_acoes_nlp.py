@@ -88,7 +88,7 @@ class CLasse_agtacoes_nlp() :
                 val_max = max(sm)
                 lista_score.append({"ID":self.frame_chunk.loc[i,"ID"],"Valor":val_max})
         frame_score = pd.DataFrame(lista_score)
-        frame_score = frame_score.sort_values(by="Valor",ascending=False).reset_index(drop=True).head(10)
+        frame_score = frame_score.sort_values(by="Valor",ascending=False).reset_index(drop=True).head(20)
         frame_score_01 = pd.merge(frame_score,self.frame_chunk,left_on="ID",right_on="ID",how="left",suffixes=("_x","_y"))
         self.frame_scores = frame_score_01.copy()
         pprint.pprint(self.frame_scores)
@@ -108,12 +108,15 @@ class CLasse_agtacoes_nlp() :
                 lista_score.append({"ID":self.frame_scores.loc[i,"ID"],"Intensidade":len(lemma_noti.intersection(lemma_query)),"Retorno":val_text})
         frame_final = pd.DataFrame(lista_score)
         frame_final_01 = pd.merge(frame_final,self.frame_tr,left_on="ID",right_on="ID_ref",how="left",suffixes=("_x","_y"))
-        frame_final_01 = frame_final_01.sort_values(by="Intensidade",ascending=False).reset_index(drop=True).head(6)
+        frame_final_01 = frame_final_01.sort_values(by="Intensidade",ascending=False).reset_index(drop=True).head(9)
         colunas_reff0 = ["Noticia","Data_ref","Tipo","Link"]
         frame_final_02 = frame_final_01[colunas_reff0]
         js_ret = frame_final_02.to_json(orient="records",force_ascii=False,indent=4)
         pprint.pprint(js_ret)
-        return js_ret
+        if len(frame_final_02) == 0 :
+            return "Sem noticias"
+        else :
+            return js_ret
 
 
     def busca_empresa(self) :
@@ -134,9 +137,13 @@ class CLasse_agtacoes_nlp() :
                 lista_score.append({"Empresa":empre_ref,"Ticker":frame_js.loc[i,"Ticker"],"Valor_Vetor":val_max})
         frame_res = pd.DataFrame(lista_score)
         frame_res = frame_res.sort_values(by="Valor_Vetor",ascending=False).reset_index(drop=True).head(7)
-        resposta_js =  frame_res.to_json(orient="records",force_ascii=False,indent=4)
+        resposta_js =  frame_res.to_json(orient="records",force_ascii=False,indent=6)
         pprint.pprint(frame_res)
-        return resposta_js
+        if len(frame_res) == 0 :
+            return "Sem empresas encontradas"
+        else :
+            return resposta_js
+
         
 
 

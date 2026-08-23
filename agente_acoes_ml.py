@@ -47,7 +47,7 @@ class CLasse_agtacoes_ml() :
 
     def criacao_tb_origem(self) :
         data_ref02 = datetime.now().strftime("%Y-%m-%d")
-        data_ref01 = (datetime.now() - timedelta(days=40)).strftime("%Y-%m-%d")
+        data_ref01 = (datetime.now() - timedelta(days=41)).strftime("%Y-%m-%d")
         frame_tr = self.tabelas.tabela_acoes(self.empre_ref,data_ref01,data_ref02)
         frame_tr["Date"] = pd.to_datetime(frame_tr["Date"],errors="coerce")
         frame_tr = frame_tr.sort_values(by="Date").reset_index(drop=True)
@@ -454,6 +454,7 @@ class CLasse_agtacoes_ml_boost() :
         frame_tr["Date"] = pd.to_datetime(frame_tr["Date"],errors="coerce")
         frame_tr["Mes"] =  frame_tr["Date"].map(lambda x : x.month)
         frame_tr["Dia"] =  frame_tr["Date"].map(lambda x : x.day)
+        frame_tr = frame_tr.drop_duplicates(subset=["Date","Ticker","Close"]).reset_index(drop=True)
         frame_tr = frame_tr.sort_values(by="Date").reset_index(drop=True)
         print(frame_tr["Ticker"].value_counts())
         self.frame_tr = frame_tr.copy()
