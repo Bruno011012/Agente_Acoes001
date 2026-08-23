@@ -15,14 +15,15 @@ from agente_acoes_anls import CLasse_agtacoes_analyses,CLasse_agtacoes_analysesc
 class CLasse_agtacoes_ge01() :
     def __init__(self,query):
         self.query = query
-        self.desencadear()
 
 
     def desencadear(self) :
         self.limpeza_diretorios()
         self.criar_parametros()
-        self.pepiline()
+        noticias = self.pepiline()
+        return noticias
 
+    
 
     def limpeza_diretorios(self) :
         lista_ref = [r".\graficos\analises_scipy",r".\graficos\comparativo",r".\enviar",r".\zips"]
@@ -57,14 +58,15 @@ class CLasse_agtacoes_ge01() :
         intencao = self.reconhecimento_intencao()
         if intencao == "OUTROS" :
             print("Outros")
+            return "Outros"
         else :
             empresas = self.reconhecimento_empresas()
             datas_ref = self.reconhecimento_datas()
             empres_ref01 = self.manipulacao_empresas_datas(0,empresas)
             datas_ref01 = self.manipulacao_empresas_datas(1,datas_ref)
             print(f"{intencao} {empresas} {datas_ref}")
-            self.pepiline_analyses(empres_ref01,datas_ref01)
-
+            noticias = self.pepiline_analyses(empres_ref01,datas_ref01)
+            return noticias
 
     def criar_parametros(self) :
         self.agentes = CLasse_agtacoes_agts()
@@ -112,7 +114,8 @@ class CLasse_agtacoes_ge01() :
                 CLasse_agtacoes_analysesc(empresas,data_ref0=datas_ref[0],data_ref1=datas_ref[1])
                 Classe_copiadora_zip(1)
         noticias = self.agentes.agente_noticias_01(self.query)
-        print(noticias)
+        return noticias
+
 
 
 class Classe_copiadora_zip() :
@@ -157,4 +160,3 @@ class Classe_copiadora_zip() :
                 
 
 
-CLasse_agtacoes_ge01("quero um relatoio da petrobras e do itau ?")

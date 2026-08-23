@@ -18,7 +18,7 @@ class CLasse_agtacoes_llm() :
             senha_ref = arquivo_tt.read()
         self.llm = ChatDeepSeek(
             model="deepseek-chat",
-            temperature=0,
+            temperature=0.3,
             max_tokens=None,
             timeout=None,
             max_retries=2,

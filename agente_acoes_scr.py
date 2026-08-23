@@ -10,6 +10,7 @@ from scrapy.utils.project import get_project_settings
 from noticias.noticias.spiders.noticias_01 import Noticias01Spider
 from noticias.noticias.spiders.noticias_02 import Noticias02Spider
 from noticias.noticias.spiders.noticias_03 import Noticias03Spider
+from noticias.noticias.spiders.noticias_04 import Noticias04Spider
 
 from scrapy import cmdline
 import re 
@@ -29,6 +30,7 @@ class CLasse_agtacoes_scr() :
         self.tratamento_01()
         self.tratamento_02()
         self.tratamento_03()
+        self.tratamento_04()
         self.consolidar_final()
 
     def disparar_spider(self) :
@@ -39,6 +41,8 @@ class CLasse_agtacoes_scr() :
         process.crawl(Noticias01Spider)
         process.crawl(Noticias02Spider)
         process.crawl(Noticias03Spider)
+        process.crawl(Noticias04Spider)
+        
 
         process.start()
     
@@ -101,6 +105,25 @@ class CLasse_agtacoes_scr() :
         filtro_01["ID_ref"] = "-"
         filtro_01["Tipo"] = "Politica Nacional"
         caminho_ref1 = os.path.join(r".\data\noticias\diario",f"Noticiaspnc_{data_ref_dd.replace('/','_')}.json") 
+        filtro_01.to_json(caminho_ref1,orient="records",force_ascii=False,indent=4)
+        print(filtro_01)
+
+
+    def tratamento_04(self) :
+        data_ref_dd = datetime.now().strftime("%d/%m/%Y")
+        caminho = r".\data\noticias\noticias_4.json"
+        frame_tr = pd.DataFrame(pd.read_json(caminho))
+        frame_tr = frame_tr.fillna("-")
+        frame_tr["Quant01"] = frame_tr["noticia_01"].map(lambda x : len(x))
+        lista_ref = []
+        for i , val_ref in enumerate(frame_tr["noticia_01"]) :
+            if val_ref.strip() != "-" and len(val_ref) > 10 :
+                lista_ref.append({"Noticia":val_ref,"Data_ref":data_ref_dd})
+        filtro_01 = pd.DataFrame(lista_ref)
+        filtro_01 = filtro_01.drop_duplicates().reset_index(drop=True)
+        filtro_01["ID_ref"] = "-"
+        filtro_01["Tipo"] = "Bolsa Americana"
+        caminho_ref1 = os.path.join(r".\data\noticias\diario",f"Noticiasbeua_{data_ref_dd.replace('/','_')}.json") 
         filtro_01.to_json(caminho_ref1,orient="records",force_ascii=False,indent=4)
         print(filtro_01)
 

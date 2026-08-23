@@ -35,10 +35,11 @@ class Noticias01Spider(scrapy.Spider):
         for linha_ref in linha :
             titulo = linha_ref.css("h3::text").get()
             titulo_01 = linha_ref.css("span::text").get()
-            yield {
-                "noticia_01":titulo,
-                "noticia_02":titulo_01,
-                "Tipo":"Acoes"
+            if titulo :
+                yield {
+                    "noticia_01":titulo,
+                    "noticia_02":titulo_01,
+                    "Tipo":"Acoes"
 
-                }
-            lista_ref.append(titulo)
+                    }
+                lista_ref.append(titulo)
