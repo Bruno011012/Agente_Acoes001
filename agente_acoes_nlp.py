@@ -109,7 +109,9 @@ class CLasse_agtacoes_nlp() :
         frame_final = pd.DataFrame(lista_score)
         frame_final_01 = pd.merge(frame_final,self.frame_tr,left_on="ID",right_on="ID_ref",how="left",suffixes=("_x","_y"))
         frame_final_01 = frame_final_01.sort_values(by="Intensidade",ascending=False).reset_index(drop=True).head(6)
-        js_ret = frame_final_01.to_json(orient="records",force_ascii=False,indent=4)
+        colunas_reff0 = ["Noticia","Data_ref","Tipo","Link"]
+        frame_final_02 = frame_final_01[colunas_reff0]
+        js_ret = frame_final_02.to_json(orient="records",force_ascii=False,indent=4)
         pprint.pprint(js_ret)
         return js_ret
 

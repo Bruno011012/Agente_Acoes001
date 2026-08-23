@@ -59,9 +59,9 @@ class CLasse_agtacoes_scr() :
         for i , val_ref in enumerate(frame_tr["noticia_01"]) :
             val_ref_02 = frame_tr.loc[i,"noticia_02"]
             if val_ref.strip() != "-" and len(val_ref) > 10 :
-                lista_ref.append({"Noticia":val_ref,"Data_ref":data_ref_dd})
+                lista_ref.append({"Noticia":val_ref,"Data_ref":data_ref_dd,"Link":frame_tr.loc[i,"Link"]})
             if val_ref_02.strip() != "-" and len(val_ref_02) > 10 :
-                lista_ref.append({"Noticia":val_ref_02,"Data_ref":data_ref_dd})
+                lista_ref.append({"Noticia":val_ref_02,"Data_ref":data_ref_dd,"Link":frame_tr.loc[i,"Link"]})
         filtro_01 = pd.DataFrame(lista_ref)
         filtro_01 = filtro_01.drop_duplicates().reset_index(drop=True)
         filtro_01["ID_ref"] = "-"
@@ -80,7 +80,7 @@ class CLasse_agtacoes_scr() :
         lista_ref = []
         for i , val_ref in enumerate(frame_tr["noticia_01"]) :
             if val_ref.strip() != "-" and len(val_ref) > 10 :
-                lista_ref.append({"Noticia":val_ref,"Data_ref":data_ref_dd})
+                lista_ref.append({"Noticia":val_ref,"Data_ref":data_ref_dd,"Link":frame_tr.loc[i,"Link"]})
         filtro_01 = pd.DataFrame(lista_ref)
         filtro_01 = filtro_01.drop_duplicates().reset_index(drop=True)
         filtro_01["ID_ref"] = "-"
@@ -99,7 +99,7 @@ class CLasse_agtacoes_scr() :
         lista_ref = []
         for i , val_ref in enumerate(frame_tr["noticia_01"]) :
             if val_ref.strip() != "-" and len(val_ref) > 10 :
-                lista_ref.append({"Noticia":val_ref,"Data_ref":data_ref_dd})
+                lista_ref.append({"Noticia":val_ref,"Data_ref":data_ref_dd,"Link":frame_tr.loc[i,"Link"]})
         filtro_01 = pd.DataFrame(lista_ref)
         filtro_01 = filtro_01.drop_duplicates().reset_index(drop=True)
         filtro_01["ID_ref"] = "-"
@@ -118,7 +118,7 @@ class CLasse_agtacoes_scr() :
         lista_ref = []
         for i , val_ref in enumerate(frame_tr["noticia_01"]) :
             if val_ref.strip() != "-" and len(val_ref) > 10 :
-                lista_ref.append({"Noticia":val_ref,"Data_ref":data_ref_dd})
+                lista_ref.append({"Noticia":val_ref,"Data_ref":data_ref_dd,"Link":frame_tr.loc[i,"Link"]})
         filtro_01 = pd.DataFrame(lista_ref)
         filtro_01 = filtro_01.drop_duplicates().reset_index(drop=True)
         filtro_01["ID_ref"] = "-"

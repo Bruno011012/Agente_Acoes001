@@ -10,7 +10,8 @@ import collections
 from agente_acoes_agts import CLasse_agtacoes_agts
 from agente_acoes_anls import CLasse_agtacoes_analyses,CLasse_agtacoes_analysesc
 from agente_acoes_ml import CLasse_agtacoes_ml
-
+from concurrent.futures import ThreadPoolExecutor
+from agente_acoes_ml_ind import CLasse_agtacoes_ml_indi
 
 class CLasse_agtacoes_ge01() :
     def __init__(self,query):
@@ -26,7 +27,7 @@ class CLasse_agtacoes_ge01() :
     
 
     def limpeza_diretorios(self) :
-        lista_ref = [r".\graficos\analises_scipy",r".\graficos\comparativo",r".\enviar",r".\zips",r".\graficos\simulacoes"]
+        lista_ref = [r".\graficos\analises_scipy",r".\graficos\comparativo",r".\enviar",r".\zips",r".\graficos\simulacoes",r".\planilhas\simulacao",r".\graficos\rendimento_sim"]
         for i , dir_ref in enumerate(lista_ref) :
             lista_arq = os.listdir(dir_ref)
             if len(lista_arq) >= 1 :
@@ -124,15 +125,41 @@ class CLasse_agtacoes_ge01() :
         noticias = self.agentes.agente_noticias_01(self.query)
         return noticias
 
+    
+    def executar_modelo(self,empresas,n_dias):
+        sm = []
+        for u_i in empresas:
+            sm.append(u_i)
+            CLasse_agtacoes_ml(sm, int(n_dias))
+            sm = []
+
+
+    def executar_indicadores(self,empresas,n_dias):
+        sm = []
+        for u_i in empresas:
+            sm.append(u_i)
+            CLasse_agtacoes_ml_indi(sm, int(n_dias))
+            sm = []
+
 
     def pepyline_simulacao(self,empresas) :
         n_dias = self.agentes.agente_identi_dias(self.query)
-        sm = []
-        for u_i in empresas :
-            sm.append(u_i)
-            CLasse_agtacoes_ml(sm,int(n_dias))
-            Classe_copiadora_zip(2)
-        noticias = self.agentes.agente_noticias_01(self.query)
+        with ThreadPoolExecutor(max_workers=2) as executor:
+            futuro_ml = executor.submit(
+                self.executar_modelo,
+                empresas,n_dias
+            )
+
+            futuro_indicadores = executor.submit(
+                self.executar_indicadores,
+                empresas,n_dias
+            )
+
+            # Espera as duas terminarem
+            futuro_ml.result()
+            futuro_indicadores.result()
+        Classe_copiadora_zip(2)
+        noticias = self.agentes.agente_noticias_02(self.query)
         return noticias
 
 
@@ -168,7 +195,7 @@ class Classe_copiadora_zip() :
 
     def copiar_simu(self) :
         destino_ref = r".\enviar"
-        origim_ref = [r".\planilhas\simulacao",r".\graficos\simulacoes"]
+        origim_ref = [r".\planilhas\simulacao",r".\graficos\simulacoes",r".\graficos\rendimento_sim"]
         for i in origim_ref :
             shutil.copytree(i,destino_ref,dirs_exist_ok=True)
 

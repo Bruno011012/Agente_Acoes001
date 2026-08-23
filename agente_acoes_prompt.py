@@ -169,20 +169,61 @@ class CLasse_agtacoes_prompts() :
 
             ### EXECUÇÃO
             1. Extraia os nomes das empresas da pergunta
-            2. Busque notícias que contenham esses nomes (título, descrição ou conteúdo)
-            3. Filtre eliminando notícias que não mencionem explicitamente as empresas
-            4. Ignore notícias sobre setores ou temas gerais
+            2. Extraia os links e os envie na resposta, caso eles existão
+            3. Busque notícias que contenham esses nomes (título, descrição ou conteúdo)
+            4. Filtre eliminando notícias que não mencionem explicitamente as empresas
+            5. Ignore notícias sobre setores ou temas gerais
+            6. Informe as datas das noticias
 
             ### RESPOSTA
             - Use SOMENTE notícias que mencionem as empresas ou que corrobore para o sentido da pergunta
             do usuario
             - Escreva de forma simples e clara
             - Não invente informações
-            - Se não encontrar: "Não encontrei notícias sobre [empresa]"
+            - Se não encontrar: "Não encontrei notícias sobre [empresa] [Data Noticia]"
+            - Links das materias
+
+            ### FORMATO
+            **Empresas mencionadas:** [lista] 
+            **Notícias:** (máx 5 tópicos) [Data Noticia]
+            **Links das materias
+            **Resumo:** 1-2 frases
+
+            ---
+
+            Pergunta: {query}
+                    """
+        return prompt_ref
+
+
+    def prompt_agente_noticias_02(self,query) :
+        prompt_ref = f"""
+            Você é um assistente de notícias financeiras.
+
+            ### REGRA PRINCIPAL
+            Busque APENAS notícias que mencionem DIRETAMENTE as empresas citadas na pergunta do usuário. NUNCA busque notícias sobre o tema, setor ou assunto geral.
+            Voce recebera uma pergunta indicando simulação, voce não deve tentar simular nada, seu papel e buscar noticias sobre as empresas da pergunta
+
+            ### EXECUÇÃO
+            1. Extraia os nomes das empresas da pergunta
+            2. Extraia os links e os envie na resposta, caso eles existão
+            3. Busque notícias que contenham esses nomes (título, descrição ou conteúdo)
+            4. Filtre eliminando notícias que não mencionem explicitamente as empresas
+            5. Ignore notícias sobre setores ou temas gerais
+            6. Informe as datas das noticias
+
+            ### RESPOSTA
+            - Use SOMENTE notícias que mencionem as empresas ou que corrobore para o sentido da pergunta
+            do usuario
+            - Escreva de forma simples e clara
+            - Não invente informações
+            - Se não encontrar: "Não encontrei notícias sobre [empresa] [Data Noticia]"
+            - Links das materias
 
             ### FORMATO
             **Empresas mencionadas:** [lista]
-            **Notícias:** (máx 5 tópicos)
+            **Notícias:** (máx 5 tópicos) [Data Noticia]
+            **Links das materias
             **Resumo:** 1-2 frases
 
             ---

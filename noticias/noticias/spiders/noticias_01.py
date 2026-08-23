@@ -35,10 +35,12 @@ class Noticias01Spider(scrapy.Spider):
         for linha_ref in linha :
             titulo = linha_ref.css("h3::text").get()
             titulo_01 = linha_ref.css("span::text").get()
-            if titulo :
+            link = linha_ref.css("a::attr(href)").get()
+            if titulo and titulo not in lista_ref :
                 yield {
                     "noticia_01":titulo,
                     "noticia_02":titulo_01,
+                    "Link":link,
                     "Tipo":"Acoes"
 
                     }
