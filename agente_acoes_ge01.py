@@ -53,13 +53,21 @@ class CLasse_agtacoes_ge01() :
             else :
                 lista_ref = x.split("/")
                 return lista_ref
-            
+
+
+    def funcao_ret_explic(self) :
+        caminho = r".\documentos\outros\explicacao.txt"
+        with open(caminho,"r",encoding="utf-8") as arquuivo_tt :
+            conteudo = arquuivo_tt.read()
+            return conteudo
+        
 
     def pepiline(self) :
         intencao = self.reconhecimento_intencao()
         if intencao == "OUTROS" :
             print("Outros")
-            return "Outros"
+            explica = partial(self.funcao_ret_explic)
+            return explica()
         elif intencao == "ANALISE" :
             empresas = self.reconhecimento_empresas()
             datas_ref = self.reconhecimento_datas()

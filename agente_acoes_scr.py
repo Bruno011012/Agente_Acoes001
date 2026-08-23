@@ -149,7 +149,7 @@ class CLasse_agtacoes_scr() :
         filtro_01 = pd.DataFrame(lista_ref)
         filtro_01 = filtro_01.drop_duplicates().reset_index(drop=True)
         filtro_01["ID_ref"] = "-"
-        filtro_01["Tipo"] = "Bolsa Americana"
+        filtro_01["Tipo"] = "Empresas"
         caminho_ref1 = os.path.join(r".\data\noticias\diario",f"Noticiasbeua2_{data_ref_dd.replace('/','_')}.json") 
         filtro_01.to_json(caminho_ref1,orient="records",force_ascii=False,indent=4)
         print(filtro_01)
