@@ -397,7 +397,7 @@ class CLasse_agtacoes_ml() :
         caminho_ht = os.path.join(r".\graficos\simulacoes",f"simulacao_ml_{self.nome_empresa_glob}.html")
         frame_tr = pd.DataFrame(pd.read_json(caminho_bs))
         frame_tr["Date"] = pd.to_datetime(frame_tr["Date"],errors="coerce")
-        grafico_01 = px.line(frame_tr,x="Date",y="Close",color="Status",title=f"Simulação {self.qtd_mes} Dias Empresa {self.frame_tr.loc[0,'Empresas']}",markers=True,template="plotly_dark")
+        grafico_01 = px.line(frame_tr,x="Date",y="Close",color="Status",title=f"Simulação Modelo - (Pymc Bayes) {self.qtd_mes} Dias Empresa {self.frame_tr.loc[0,'Empresas']}",markers=True,template="plotly_dark")
         grafico_01.write_html(caminho_ht,full_html=True,
                     include_plotlyjs=True,
                     config={

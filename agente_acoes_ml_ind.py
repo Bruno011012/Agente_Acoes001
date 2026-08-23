@@ -23,6 +23,7 @@ import plotly.express as px
 import webbrowser
 from plotly.subplots import make_subplots
 import plotly.io as pio
+import plotly.graph_objects as go
 
 
 class CLasse_agtacoes_ml_indi() :
@@ -387,6 +388,7 @@ class CLasse_agtacoes_ml_indi() :
         frame_final1["Erro_Medio"] = frame_final1["Variacao"].mean()
         frame_final1["Erro_Mediana"] = frame_final1["Variacao"].median()
         frame_final1["Erro_Desvio"] = frame_final1["Variacao"].std()
+        frame_final1[["Open","High","Low","Previsto","Real","Volume","Variacao","Erro_Medio","Erro_Mediana","Erro_Desvio"]] = frame_final1[["Open","High","Low","Previsto","Real","Volume","Variacao","Erro_Medio","Erro_Mediana","Erro_Desvio"]].map(lambda x : round(float(x),2))
         self.frame_analyses = frame_final1.copy()
         print(frame_final1)
 
@@ -399,14 +401,15 @@ class CLasse_agtacoes_ml_indi() :
         grafico_05 = px.scatter_3d(self.frame_analyses,x="Previsto",y="Real",z="Variacao",template="plotly_dark")
         grafico_06 = px.violin(self.frame_analyses,x="Variacao",title="Distribuições Variação",template="plotly_dark")
         fig = make_subplots(
-        rows=3,
+        rows=4,
         cols=2,
 
         # O gráfico 05 ocupa as duas colunas
         specs=[
             [{"type": "xy"}, {"type": "xy"}],
             [{"type": "xy"}, {"type": "xy"}],
-            [{"type": "scene"}, {"type": "xy"}]
+            [{"type": "scene"}, {"type": "xy"}],
+            [{"type": "table", "colspan": 2}, None]
         ],
 
         subplot_titles=[
@@ -415,7 +418,8 @@ class CLasse_agtacoes_ml_indi() :
             "Tendência da Simulação",
             "Previsto vs Real",
             "Erro da previsão em 3D",
-            "Distribuição da Variação"
+            "Distribuição da Variação",
+            "Dados da Simulação"
         ],
 
         vertical_spacing=0.08,
@@ -445,12 +449,101 @@ class CLasse_agtacoes_ml_indi() :
 
         for trace in grafico_06.data:
             fig.add_trace(trace, row=3, col=2)
+        tabela = go.Table(
 
+        # =========================
+        # CABEÇALHO
+        # =========================
+        header=dict(
+            values=[
+                "<b>EMPRESA</b>",
+                "<b>DATA</b>",
+                "<b>PREVISTO</b>",
+                "<b>REAL</b>",
+                "<b>OPEN</b>",
+                "<b>HIGH</b>",
+                "<b>LOW</b>",
+                "<b>VOLUME</b>",
+                "<b>VARIAÇÃO</b>",
+                "<b>ERRO MÉDIO</b>",
+                "<b>ERRO MEDIANA</b>",
+                "<b>ERRO DESVIO</b>"
+            ],
+
+            align="center",
+
+            fill=dict(
+                color="#081120"
+            ),
+
+            font=dict(
+                color="#00F5FF",
+                size=12,
+                family="Arial"
+            ),
+
+            line=dict(
+                color="#00F5FF",
+                width=1
+            ),
+
+            height=35
+        ),
+
+        # =========================
+        # CÉLULAS
+        # =========================
+        cells=dict(
+
+            values=[
+                self.frame_analyses["Empresas"],
+                self.frame_analyses["Date"],
+                self.frame_analyses["Previsto"].round(4),
+                self.frame_analyses["Real"].round(4),
+                self.frame_analyses["Open"].round(4),
+                self.frame_analyses["High"].round(4),
+                self.frame_analyses["Low"].round(4),
+                self.frame_analyses["Volume"],
+                self.frame_analyses["Variacao"].round(4),
+                self.frame_analyses["Erro_Medio"].round(4),
+                self.frame_analyses["Erro_Mediana"].round(4),
+                self.frame_analyses["Erro_Desvio"].round(4)
+            ],
+
+            align="center",
+
+            fill=dict(
+                color=[
+                    ["#0B1626", "#101D30"]
+                    * (len(self.frame_analyses) // 2 + 1)
+                ]
+                * 12
+            ),
+
+            font=dict(
+                color="#D9E1E8",
+                size=11,
+                family="Arial"
+            ),
+
+            line=dict(
+                color="#18496F",
+                width=1
+            ),
+
+            height=30
+        )
+        )
+        fig.add_trace(
+            tabela,
+            row=4,
+            col=1
+        )
         fig.update_layout(
             template="plotly_dark",
 
             title=dict(
-                text="Análise das Previsões",
+                text=f"Rendimento do Modelo - (Pymc Bayes) {self.nome_empresa_glob}",
                 x=0.5,
                 xanchor="center"
             ),
