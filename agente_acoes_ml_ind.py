@@ -370,7 +370,7 @@ class CLasse_agtacoes_ml_indi() :
             sigma = pm.HalfNormal("sigma", sigma=1)
             mu = alpha + pm.math.dot(X_data,beta)
             Y_obs = pm.Normal("Y_obs",mu=mu,sigma=sigma,observed=y_data)
-            idata = pm.sample(draws=50,tune=50,chains=1,cores=1)
+            idata = pm.sample(draws=150,tune=150,chains=1,cores=1)
         with model :
             pm.set_data({"X_data":self.x_test,"y_data":self.y_test})
             predicoes_01 = pm.sample_posterior_predictive(idata,var_names=["Y_obs"],predictions=True).predictions
