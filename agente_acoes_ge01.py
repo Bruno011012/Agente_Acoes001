@@ -9,7 +9,7 @@ from toolz import compose,compose_left
 import collections
 from agente_acoes_agts import CLasse_agtacoes_agts
 from agente_acoes_anls import CLasse_agtacoes_analyses,CLasse_agtacoes_analysesc
-
+from agente_acoes_ml import CLasse_agtacoes_ml
 
 
 class CLasse_agtacoes_ge01() :
@@ -26,7 +26,7 @@ class CLasse_agtacoes_ge01() :
     
 
     def limpeza_diretorios(self) :
-        lista_ref = [r".\graficos\analises_scipy",r".\graficos\comparativo",r".\enviar",r".\zips"]
+        lista_ref = [r".\graficos\analises_scipy",r".\graficos\comparativo",r".\enviar",r".\zips",r".\graficos\simulacoes"]
         for i , dir_ref in enumerate(lista_ref) :
             lista_arq = os.listdir(dir_ref)
             if len(lista_arq) >= 1 :
@@ -59,13 +59,21 @@ class CLasse_agtacoes_ge01() :
         if intencao == "OUTROS" :
             print("Outros")
             return "Outros"
-        else :
+        elif intencao == "ANALISE" :
             empresas = self.reconhecimento_empresas()
             datas_ref = self.reconhecimento_datas()
             empres_ref01 = self.manipulacao_empresas_datas(0,empresas)
             datas_ref01 = self.manipulacao_empresas_datas(1,datas_ref)
             print(f"{intencao} {empresas} {datas_ref}")
             noticias = self.pepiline_analyses(empres_ref01,datas_ref01)
+            return noticias
+        elif intencao == "SIMULACAO" :
+            empresas = self.reconhecimento_empresas()
+            datas_ref = self.reconhecimento_datas()
+            empres_ref01 = self.manipulacao_empresas_datas(0,empresas)
+            datas_ref01 = self.manipulacao_empresas_datas(1,datas_ref)
+            print(f"{intencao} {empresas} {datas_ref}")
+            noticias = self.pepyline_simulacao(empres_ref01)
             return noticias
 
     def criar_parametros(self) :
@@ -117,6 +125,17 @@ class CLasse_agtacoes_ge01() :
         return noticias
 
 
+    def pepyline_simulacao(self,empresas) :
+        n_dias = self.agentes.agente_identi_dias(self.query)
+        sm = []
+        for u_i in empresas :
+            sm.append(u_i)
+            CLasse_agtacoes_ml(sm,int(n_dias))
+            Classe_copiadora_zip(2)
+        noticias = self.agentes.agente_noticias_01(self.query)
+        return noticias
+
+
 
 class Classe_copiadora_zip() :
     def __init__(self,tipo):
@@ -127,9 +146,11 @@ class Classe_copiadora_zip() :
     def desencadear(self) :
         if self.tipo == 0 :
             self.copiar_individual()
-        else :
+        elif self.tipo == 1 :
             self.copiar_individual()
             self.copiar_compe()
+        elif self.tipo == 2 :
+            self.copiar_simu()
         self.zipar_final()
 
 
@@ -143,6 +164,13 @@ class Classe_copiadora_zip() :
         destino_ref = r".\enviar"
         origim_ref = r".\graficos\comparativo"
         shutil.copytree(origim_ref,destino_ref,dirs_exist_ok=True)
+
+
+    def copiar_simu(self) :
+        destino_ref = r".\enviar"
+        origim_ref = [r".\planilhas\simulacao",r".\graficos\simulacoes"]
+        for i in origim_ref :
+            shutil.copytree(i,destino_ref,dirs_exist_ok=True)
 
 
     def zipar_final(self) :

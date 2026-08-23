@@ -57,3 +57,10 @@ class CLasse_agtacoes_agts(CLasse_agtacoes_llm) :
         agent = create_agent(self.llm,tools=tools_ref,system_prompt=prompt_ref)
         response = agent.invoke({"input":prompt_ref})
         return self.verificar_resposta(response)
+
+
+    def agente_identi_dias(self,query) :
+        prompt_ref = self.prompts.prompt_agente_iddias(query)
+        agent = create_agent(self.llm,system_prompt=prompt_ref)
+        response = agent.invoke({"input":prompt_ref})
+        return self.verificar_resposta(response)

@@ -17,25 +17,49 @@ class CLasse_agtacoes_prompts() :
         prompt = f"""
                 Você é um agente de reconhecimento de intenções especializado em classificar perguntas sobre ações.
 
-                Sua função é analisar a pergunta do usuário e classificar em UMA das três intenções abaixo:
+                ### SUA FUNÇÃO
+                Analise a pergunta do usuário e classifique em UMA das três intenções abaixo.
 
-                1. ANALISE - Perguntas sobre dados históricos, relatórios, diagnósticos, 
-                pesquisas, analises, indicadores atuais e comportamento passado das ações.
+                ### CLASSIFICAÇÕES
 
-                2. SIMULACAO - Perguntas sobre projeções futuras, previsões, valores estimados, 
-                cenários e simulações de desempenho.
+                1. **SIMULACAO** (prioridade máxima)
+                - Perguntas sobre PROJEÇÕES FUTURAS
+                - Palavras-chave: "simulação", "simular", "previsão", "projeção", "estimativa", "futuro", "próximos dias", "vai ser", "irá", "deve chegar", "potencial", "cenário futuro"
+                - Exemplos:
+                    - "Me dê uma simulação das ações da Petrobras para o próximo mês" ✅ SIMULACAO
+                    - "Qual a previsão para a Vale amanhã?" ✅ SIMULACAO
+                    - "Projete o desempenho da Apple para 2025" ✅ SIMULACAO
 
-                3. OUTROS - Perguntas que não se encaixam nas opções acima, como:
+                2. **ANALISE**
+                - Perguntas sobre DADOS HISTÓRICOS E PASSADO
+                - Palavras-chave: "análise", "analisar", "relatório", "histórico", "diagnóstico", "indicadores", "comportamento passado", "foi", "teve", "registrou", "aconteceu"
+                - Exemplos:
+                    - "Faça uma análise das ações da Petrobras" ✅ ANALISE
+                    - "Qual foi o desempenho da Vale no último trimestre?" ✅ ANALISE
+                    - "Me mostre o histórico da Apple" ✅ ANALISE
+
+                3. **OUTROS**
                 - Saudações (oi, olá, bom dia)
-                - Perguntas sobre o funcionamento do agente
+                - Perguntas sobre o agente (como funciona, o que faz)
                 - Assuntos não relacionados a ações
-                - Perguntas sobre outros ativos (criptomoedas, forex, etc.)
-                - Comandos ou instruções gerais
+                - Criptomoedas, forex, outros ativos
+                - Comandos gerais
 
-                REGRAS:
+                ### REGRA DE OURO (CRÍTICA)
+                🔴 **PRIORIZE SEMPRE "SIMULACAO" quando a pergunta envolver futuro, projeção ou estimativa simulação**
+                🟢 **NUNCA classifique como "ANALISE" se a pergunta mencionar futuro**
+
+                ### DICAS PARA ACERTAR
+                - Se tiver palavra de futuro (vai, será, próximo, amanhã, estimado) → SIMULACAO
+                - Se tiver palavra de passado (foi, teve, aconteceu, histórico) → ANALISE
+                - Se não tiver verbo relacionado a tempo → OUTROS
+
+                ### REGRAS DE SAÍDA
                 - Responda APENAS com "ANALISE", "SIMULACAO" ou "OUTROS"
                 - Sem explicações, pontuação ou formatação extra
-                - Se houver dúvida ou não se encaixar claramente, classifique como "OUTROS"
+                - Se houver dúvida, classifique como "SIMULACAO" (prioridade para futuro)
+
+                ---
 
                 Pergunta do usuário: {query}
                 Classificação:
@@ -164,5 +188,49 @@ class CLasse_agtacoes_prompts() :
             ---
 
             Pergunta: {query}
+                    """
+        return prompt_ref
+
+
+    def prompt_agente_iddias(self,query) :
+        prompt_ref = f"""
+                    Você é um agente especializado em extrair o período (em dias) de uma simulação solicitada pelo usuário.
+
+                    ### SUA MISSÃO
+                    Analise a pergunta do usuário e identifique qual o período de tempo (em DIAS) que ele deseja para a simulação.
+
+                    ### REGRAS OBRIGATÓRIAS
+                    1. Retorne APENAS um número inteiro representando a quantidade de dias
+                    2. NÃO adicione texto, explicações ou formatação
+                    3. Se não encontrar um período específico, retorne 30 (padrão)
+
+                    ### MAPEAMENTO DE PERÍODOS COMUNS
+                    - "próximo mês" / "1 mês" → 30 dias
+                    - "próximos 30 dias" → 30 dias
+                    - "próximo ano" / "1 ano" → 365 dias
+                    - "próximos 7 dias" / "1 semana" → 7 dias
+                    - "próximos 15 dias" / "15 dias" → 15 dias
+                    - "próximo trimestre" / "3 meses" → 90 dias
+                    - "próximo semestre" / "6 meses" → 180 dias
+
+                    ### EXEMPLOS
+                    - Pergunta: "me dê uma simulação das ações da Petrobras para o próximo mês" → 30
+                    - Pergunta: "simule o desempenho da Vale para os próximos 15 dias" → 15
+                    - Pergunta: "qual a previsão para as ações da Apple nos próximos 7 dias?" → 7
+                    - Pergunta: "simulação anual para a Ambev" → 365
+                    - Pergunta: "simulação para semana que vem" → 7
+                    - Pergunta: "me mostre uma simulação" → 30 (padrão)
+
+                    ### CONVERSÕES ESPECIAIS
+                    - "amanhã" → 1
+                    - "hoje" → 1
+                    - "curto prazo" → 7
+                    - "médio prazo" → 90
+                    - "longo prazo" → 365
+
+                    ---
+
+                    Pergunta do usuário: {query}
+                    
                     """
         return prompt_ref

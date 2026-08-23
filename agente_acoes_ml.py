@@ -19,11 +19,13 @@ from datetime import datetime,timedelta,date
 import time
 import calendar
 from dateutil.relativedelta import relativedelta
-
+import plotly.express as px 
+import webbrowser
 
 
 class CLasse_agtacoes_ml() :
-    def __init__(self,qnt_mes):
+    def __init__(self,empre_ref,qnt_mes):
+        self.empre_ref = empre_ref
         self.qtd_mes = qnt_mes
         self.desencadear()
 
@@ -34,7 +36,8 @@ class CLasse_agtacoes_ml() :
         self.funcao_invocar_base_previsao()
         self.criacao_base_treino_teste()
         self.criacao_modelo_bayes()
-
+        self.criar_grafico_simulacao()
+        
 
     def criar_parametros(self) :
         self.modelo_bossting = CLasse_agtacoes_ml_boost(self.qtd_mes)
@@ -44,7 +47,7 @@ class CLasse_agtacoes_ml() :
     def criacao_tb_origem(self) :
         data_ref02 = datetime.now().strftime("%Y-%m-%d")
         data_ref01 = (datetime.now() - timedelta(days=40)).strftime("%Y-%m-%d")
-        frame_tr = self.tabelas.tabela_acoes(["AMZN"],data_ref01,data_ref02)
+        frame_tr = self.tabelas.tabela_acoes(self.empre_ref,data_ref01,data_ref02)
         frame_tr["Date"] = pd.to_datetime(frame_tr["Date"],errors="coerce")
         frame_tr = frame_tr.sort_values(by="Date").reset_index(drop=True)
         frame_tr = self.engenharia_features_signal(frame_tr)
@@ -355,7 +358,7 @@ class CLasse_agtacoes_ml() :
             sigma = pm.HalfNormal("sigma", sigma=1)
             mu = alpha + pm.math.dot(X_data,beta)
             Y_obs = pm.Normal("Y_obs",mu=mu,sigma=sigma,observed=y_data)
-            idata = pm.sample(draws=150,tune=150,chains=1,cores=1)
+            idata = pm.sample(draws=50,tune=50,chains=1,cores=1)
         with model :
             pm.set_data({"X_data":self.x_test,"y_data":self.y_test})
             predicoes_01 = pm.sample_posterior_predictive(idata,var_names=["Y_obs"],predictions=True).predictions
@@ -367,7 +370,35 @@ class CLasse_agtacoes_ml() :
             frame_final = pd.DataFrame(lista_frame)
             frame_final1 = pd.concat([frame_final,self.df_test0],axis=1)
         print("Base Previsao")
+        colunas_ref = ["Date","Open","High","Low","Previsto","Volume","Nome_Empresa"]
+        colunas_ref_1 = ["Date","Open","High","Low","Close","Volume","Empresas"]
+        frame_final2 = frame_final1[colunas_ref]
+        frame_final2 = frame_final2.rename(columns={"Previsto":"Close","Nome_Empresa":"Empresas"})
+        frame_final2["Status"] = "Simulacao"
+        frame_concat = self.frame_tr[colunas_ref_1]
+        nome_eempre = frame_concat.loc[0,"Empresas"]
+        frame_concat["Status"] = "Historico"
+        frame_final3 = pd.concat([frame_concat,frame_final2]).reset_index(drop=True)
+        caminho_dest = r".\planilhas\simulacao"
+        arquivo_des = os.path.join(caminho_dest,"Simulacao.json")
+        frame_final3["Date"] = frame_final3["Date"].astype(str)
+        frame_final3["Empresas"] = nome_eempre
+        frame_final3.to_json(arquivo_des,orient="records",force_ascii=False,indent=4)
         print(frame_final1)
+
+
+    def criar_grafico_simulacao(self) :
+        caminho_bs = r".\planilhas\simulacao\Simulacao.json"
+        caminho_ht = os.path.join(r".\graficos\simulacoes","simulacao_ml.html")
+        frame_tr = pd.DataFrame(pd.read_json(caminho_bs))
+        frame_tr["Date"] = pd.to_datetime(frame_tr["Date"],errors="coerce")
+        grafico_01 = px.line(frame_tr,x="Date",y="Close",color="Status",title=f"Simulação {self.qtd_mes} Dias Empresa {self.frame_tr.loc[0,'Empresas']}",markers=True,template="plotly_dark")
+        grafico_01.write_html(caminho_ht,full_html=True,
+                    include_plotlyjs=True,
+                    config={
+                        "responsive": True
+                    })
+
 
 
 
@@ -477,7 +508,3 @@ class CLasse_agtacoes_ml_boost() :
         return y_predict[0]
 
     
-
-
-
-CLasse_agtacoes_ml(7)
