@@ -32,6 +32,7 @@ class CLasse_agtacoes_ml() :
 
     def desencadear(self) :
         self.criar_parametros()
+        self.conferencia_param_ditrei()
         self.criacao_tb_origem()
         self.funcao_invocar_base_previsao()
         self.criacao_base_treino_teste()
@@ -44,10 +45,22 @@ class CLasse_agtacoes_ml() :
         self.tabelas = CLasse_agtacoes_q()
 
 
+    def conferencia_param_ditrei(self) :
+        if self.qtd_mes <= 10 :
+            self.val_sdiame = 10
+        elif self.qtd_mes > 10 and self.qtd_mes <= 30:
+            self.val_sdiame = 20
+        elif self.qtd_mes > 30 and self.qtd_mes <= 70:
+            self.val_sdiame = 55
+        elif self.qtd_mes > 70 and self.qtd_mes <= 100:
+            self.val_sdiame = 95
+        else :
+            self.val_sdiame = 360
+
 
     def criacao_tb_origem(self) :
         data_ref02 = datetime.now().strftime("%Y-%m-%d")
-        data_ref01 = (datetime.now() - timedelta(days=41)).strftime("%Y-%m-%d")
+        data_ref01 = (datetime.now() - timedelta(days=(31 + self.val_sdiame))).strftime("%Y-%m-%d")
         frame_tr = self.tabelas.tabela_acoes(self.empre_ref,data_ref01,data_ref02)
         frame_tr["Date"] = pd.to_datetime(frame_tr["Date"],errors="coerce")
         frame_tr = frame_tr.sort_values(by="Date").reset_index(drop=True)
