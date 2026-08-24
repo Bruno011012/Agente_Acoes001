@@ -108,12 +108,15 @@ class CLasse_agtacoes_nlp() :
                 lista_score.append({"ID":self.frame_scores.loc[i,"ID"],"Intensidade":len(lemma_noti.intersection(lemma_query)),"Retorno":val_text})
         frame_final = pd.DataFrame(lista_score)
         frame_final_01 = pd.merge(frame_final,self.frame_tr,left_on="ID",right_on="ID_ref",how="left",suffixes=("_x","_y")).head(20)
-        frame_final_01 = (
-            frame_final_01
-            .sample(n=9, random_state=42)
-            .reset_index(drop=True)
-        )
-        frame_final_01 = frame_final_01.sort_values(by="Intensidade",ascending=False).reset_index(drop=True)
+        if len(frame_final_01) >= 9 :
+            frame_final_01 = (
+                frame_final_01
+                .sample(n=9, random_state=42)
+                .reset_index(drop=True)
+            )
+        else :
+            frame_final_01 = frame_final_01.sort_values(by="Intensidade",ascending=False).reset_index(drop=True)
+            frame_final_01 = frame_final_01.head(9)
         colunas_reff0 = ["Noticia","Data_ref","Tipo","Link"]
         frame_final_02 = frame_final_01[colunas_reff0]
         js_ret = frame_final_02.to_json(orient="records",force_ascii=False,indent=4)
