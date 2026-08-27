@@ -66,9 +66,9 @@ class CLasse_agtacoes_ml() :
         frame_tr = frame_tr.sort_values(by="Date").reset_index(drop=True)
         frame_tr = frame_tr.drop_duplicates(subset=["Date","Ticker","Close"]).reset_index(drop=True)
         frame_tr = self.engenharia_features_signal(frame_tr)
+        print(frame_tr)
         frame_tr["Mes"] = frame_tr["Date"].map(lambda x : x.month)
         frame_tr["Dia"] = frame_tr["Date"].map(lambda x : x.day)
-        print(frame_tr)
         self.nome_empresa_glob = frame_tr.loc[0,"Empresas"]
         self.frame_tr = frame_tr.copy()
 

@@ -19,8 +19,8 @@ class Classe_api_acoes() :
 
     def desencadear(self) :
         self.criar_parametros()
-        # self.gerar_requisicao()
-        self.gerar_requisicao_diaria()
+        self.gerar_requisicao()
+        # self.gerar_requisicao_diaria()
 
 
     def criar_parametros(self) :
@@ -82,9 +82,9 @@ class Classe_api_acoes() :
 
         # Baixa os últimos 6 meses com TODAS as colunas
         df_fina0 = yf.download(self.tickers, period="24mo", auto_adjust=True, progress=False)
-        df_fina1 = df_fina0.stack(level=1, future_stack=True).reset_index()
+        df_fina1 = df_fina0.stack(level=1).reset_index()
         df_fina1 = df_fina1[["Date", "Ticker", "Open", "High", "Low", "Close", "Volume"]]
-        df_fina1 = df_fina1.fillna(0)
+        df_fina1 = df_fina1.dropna().reset_index(drop=True)
         df_fina1["Nome_Empresa"] = df_fina1["Ticker"].map(self.funcao_aux_01)
         print(df_fina1)
         df_fina1["Date"] = df_fina1["Date"].astype(str)
@@ -105,7 +105,7 @@ class Classe_api_acoes() :
         ontem = (datetime.now() - timedelta(days=10)).strftime('%Y-%m-%d')
         hoje = datetime.now().strftime('%Y-%m-%d')
         df_fina0 = yf.download(self.tickers, start=ontem,end=hoje, auto_adjust=True, progress=False)
-        df_fina1 = df_fina0.stack(level=1, future_stack=True).reset_index()
+        df_fina1 = df_fina0.stack(level=1).reset_index()
         df_fina1 = df_fina1[["Date", "Ticker", "Open", "High", "Low", "Close", "Volume"]]
         df_fina1 = df_fina1.fillna(0)
         df_fina1["Nome_Empresa"] = df_fina1["Ticker"].map(self.funcao_aux_01)
