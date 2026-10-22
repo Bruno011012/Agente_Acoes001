@@ -70,6 +70,7 @@ class CLasse_agtacoes_q() :
                 """
         frame_tr = pd.DataFrame(pd.read_sql_query(query,self.conexao))
         frame_tr["Empresas"] = frame_tr["Ticker"].map(self.funcao_aux_01)
+        frame_tr.dropna(subset=["Date"],inplace=True)
         return frame_tr
 
 
@@ -81,6 +82,7 @@ class CLasse_agtacoes_q() :
                 """
         frame_tr = pd.DataFrame(pd.read_sql_query(query,self.conexao))
         frame_tr["Empresas"] = frame_tr["Ticker"].map(self.funcao_aux_01)
+        frame_tr.dropna(subset=["Date"],inplace=True)
         return frame_tr
 
 

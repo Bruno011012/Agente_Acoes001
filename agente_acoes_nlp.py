@@ -104,21 +104,24 @@ class CLasse_agtacoes_nlp() :
             if lemma_noti.intersection(lemma_query) :
                 val_text = f""""""
                 for v_r in lemma_noti.intersection(lemma_query) :
-                    val_text = f"""{val_text} {v_r}"""
+                    val_text = f"""{val_text} {v_r}""".strip()
                 lista_score.append({"ID":self.frame_scores.loc[i,"ID"],"Intensidade":len(lemma_noti.intersection(lemma_query)),"Retorno":val_text})
         frame_final = pd.DataFrame(lista_score)
-        frame_final_01 = pd.merge(frame_final,self.frame_tr,left_on="ID",right_on="ID_ref",how="left",suffixes=("_x","_y")).head(20)
-        if len(frame_final_01) >= 9 :
-            frame_final_01 = (
-                frame_final_01
-                .sample(n=9, random_state=42)
-                .reset_index(drop=True)
-            )
-        else :
-            frame_final_01 = frame_final_01.sort_values(by="Intensidade",ascending=False).reset_index(drop=True)
-            frame_final_01 = frame_final_01.head(9)
+        frame_final_01 = pd.merge(frame_final,self.frame_tr,left_on="ID",right_on="ID_ref",how="left",suffixes=("_x","_y"))
+        lista_clasref = list(frame_final_01["Retorno"].unique())
+        lista_filtr01 = []
+        for clas_entr in lista_clasref :
+            print(f" Evidencia Procurada {clas_entr}".center(100,"#"))
+            filtro_f01 = frame_final_01[frame_final_01["Retorno"] == clas_entr].reset_index(drop=True)
+            if len(filtro_f01) > 1 :
+                amostra = filtro_f01.sample(n=2).reset_index(drop=True).to_dict(orient="records")
+            else :
+                amostra = filtro_f01.sample(n=1).reset_index(drop=True).to_dict(orient="records")
+            for i_a in amostra :
+                lista_filtr01.append(i_a)
+        frame_amostragem = pd.DataFrame(lista_filtr01)
         colunas_reff0 = ["Noticia","Data_ref","Tipo","Link"]
-        frame_final_02 = frame_final_01[colunas_reff0]
+        frame_final_02 = frame_amostragem[colunas_reff0]
         js_ret = frame_final_02.to_json(orient="records",force_ascii=False,indent=4)
         pprint.pprint(js_ret)
         if len(frame_final_02) == 0 :
